@@ -1,0 +1,37 @@
+{
+  "name": "personal-finance",
+  "version": "1.0.0",
+  "description": "Personal finance budget web app using Express, MySQL stored procedures, and vanilla JS.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mysql",
+    "budget",
+    "personal-finance"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "jquery": "^3.7.1",
+    "mysql2": "^3.15.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  }
+}
