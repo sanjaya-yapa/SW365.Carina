@@ -97,9 +97,65 @@ function validateEnumString(fieldName, allowedValues, options) {
   };
 }
 
+function validatePositiveIntRange(fieldName, min, max, options) {
+  const source = (options && options.source) || 'body';
+
+  return (req) => {
+    const container = req[source] || {};
+    const value = container[fieldName];
+    const parsed = Number(value);
+
+    if (!Number.isInteger(parsed)) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be an integer`
+      };
+    }
+
+    if (parsed < min || parsed > max) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be between ${min} and ${max}`
+      };
+    }
+
+    container[fieldName] = parsed;
+    return null;
+  };
+}
+
+function validatePositiveDecimal(fieldName, options) {
+  const source = (options && options.source) || 'body';
+
+  return (req) => {
+    const container = req[source] || {};
+    const value = container[fieldName];
+    const parsed = parseFloat(value);
+
+    if (isNaN(parsed)) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be a valid number`
+      };
+    }
+
+    if (parsed <= 0) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be greater than 0`
+      };
+    }
+
+    container[fieldName] = parsed;
+    return null;
+  };
+}
+
 module.exports = {
   validateRequest,
   validatePositiveIntParam,
   validateRequiredString,
-  validateEnumString
+  validateEnumString,
+  validatePositiveIntRange,
+  validatePositiveDecimal
 };
