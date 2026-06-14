@@ -40,9 +40,26 @@ function unwrapProcedureRows(resultRows){
  * @returns {Promise<Array>} Array of budget plan objects
  */
 async function getBudgetPlanByMonth(year, month) {
-    const execute = getExecute();
-    const [rows] = await execute('CALL sp_get_budget_plan_by_month(?, ?)', [year, month]);
-    return unwrapProcedureRows(rows);
+	try {
+		console.log('🔍 DEBUG: getBudgetPlanByMonth called with:', { year, month });
+		const execute = getExecute();
+		console.log('✅ DEBUG: Database executor obtained');
+		
+		const [rows] = await execute('CALL sp_get_budget_plan_by_month(?, ?)', [year, month]);
+		console.log('✅ DEBUG: Stored procedure returned:', rows);
+		
+		const result = unwrapProcedureRows(rows);
+		console.log('✅ DEBUG: Unwrapped rows:', result);
+		return result;
+	} catch (err) {
+		console.error('❌ DEBUG: getBudgetPlanByMonth error:', {
+			message: err.message,
+			code: err.code,
+			sqlState: err.sqlState,
+			stack: err.stack
+		});
+		throw err;
+	}
 }
 
 /**
@@ -53,16 +70,35 @@ async function getBudgetPlanByMonth(year, month) {
  * @param {number} month
  * @param {string} categoryId
  * @param {number} plannedAmount
+ * @param {string} note - Optional note about the budget plan
  * @returns {Promise<Object>} The created/updated budget plan record
  */
-async function upsertBudgetPlan(year, month, categoryId, plannedAmount) {
-    const execute = getExecute();
-    const [rows] = await execute(
-        'CALL sp_upsert_budget_plan(?, ?, ?, ?)',
-        [year, month, categoryId, plannedAmount]
-    );
-    const data = unwrapProcedureRows(rows);
-    return data[0] || null;
+async function upsertBudgetPlan(year, month, categoryId, plannedAmount, note = null) {
+    try {
+        console.log('🔍 DEBUG: upsertBudgetPlan called with:', { year, month, categoryId, plannedAmount, note });
+        const execute = getExecute();
+        console.log('✅ DEBUG: Database executor obtained');
+        
+        console.log('🔍 DEBUG: Calling sp_upsert_budget_plan with params:', [year, month, categoryId, plannedAmount, note]);
+        const [rows] = await execute(
+            'CALL sp_upsert_budget_plan(?, ?, ?, ?, ?)',
+            [year, month, categoryId, plannedAmount, note]
+        );
+        console.log('✅ DEBUG: Stored procedure returned:', rows);
+        
+        const data = unwrapProcedureRows(rows);
+        console.log('✅ DEBUG: Unwrapped data:', data);
+        
+        return data[0] || null;
+    } catch (err) {
+        console.error('❌ DEBUG: upsertBudgetPlan error:', {
+            message: err.message,
+            code: err.code,
+            sqlState: err.sqlState,
+            stack: err.stack
+        });
+        throw err;
+    }
 }
 
 module.exports = {

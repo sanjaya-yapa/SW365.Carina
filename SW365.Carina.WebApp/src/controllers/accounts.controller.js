@@ -40,8 +40,8 @@ async function getAccounts(req, res) {
 
 async function createAccount(req, res) {
 	try {
-		const { name, accountType } = req.body;
-		const created = await accountsService.addAccount(name, accountType);
+		const { name, accountType, openingBalance } = req.body;
+		const created = await accountsService.addAccount(name, accountType, openingBalance || 0);
 
 		return sendSuccess(res, created, 'Account created successfully', 201);
 	} catch (err) {
@@ -53,9 +53,9 @@ async function createAccount(req, res) {
 async function updateAccount(req, res) {
 	try {
 		const { id } = req.params;
-		const { name, accountType } = req.body;
+		const { name, accountType, openingBalance } = req.body;
 
-		const updated = await accountsService.updateAccount(id, name, accountType);
+		const updated = await accountsService.updateAccount(id, name, accountType, openingBalance || 0);
 		return sendSuccess(res, updated, 'Account updated successfully', 200);
 	} catch (err) {
 		const mapped = mapServiceError(err);

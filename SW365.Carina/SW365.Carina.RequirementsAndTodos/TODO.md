@@ -86,36 +86,36 @@ Status Legend:
   - [x] `/api/budgets`
   - [x] `/api/transactions`
   - [x] `/api/reports`
-- [ ] Add controller methods with flow:
-  - [ ] Accounts controller flow:
-    - [ ] `GET /api/accounts`: validate query -> call `sp_get_accounts` -> `sendSuccess(200)`
-    - [ ] `POST /api/accounts`: validate body -> call `sp_add_account` -> `sendSuccess(201)`
-    - [ ] `PUT /api/accounts/:id`: validate params/body -> call `sp_update_account` -> `sendSuccess(200)`
-    - [ ] `PATCH /api/accounts/:id/deactivate`: validate params -> call `sp_deactivate_account` -> `sendSuccess(200)`
-  - [ ] Categories controller flow:
+- [x] Add controller methods with flow:
+  - [x] Accounts controller flow:
+    - [x] `GET /api/accounts`: validate query -> call `sp_get_accounts` -> `sendSuccess(200)`
+    - [x] `POST /api/accounts`: validate body -> call `sp_add_account` -> `sendSuccess(201)`
+    - [x] `PUT /api/accounts/:id`: validate params/body -> call `sp_update_account` -> `sendSuccess(200)`
+    - [x] `PATCH /api/accounts/:id/deactivate`: validate params -> call `sp_deactivate_account` -> `sendSuccess(200)`
+  - [x] Categories controller flow:
     - [x] `GET /api/categories`: validate query -> call `sp_get_categories` -> `sendSuccess(200)`
     - [x] `POST /api/categories`: validate body -> call `sp_add_category` -> `sendSuccess(201)`
     - [x] `PUT /api/categories/:id`: validate params/body -> call `sp_update_category` -> `sendSuccess(200)`
     - [x] `PATCH /api/categories/:id/deactivate`: validate params -> call `sp_deactivate_category` -> `sendSuccess(200)`
-  - [ ] Budgets controller flow:
-    - [ ] `GET /api/budgets?year=&month=`: validate query -> call `sp_get_budget_plan_by_month` -> `sendSuccess(200)`
-    - [ ] `POST /api/budgets/upsert`: validate body -> call `sp_upsert_budget_plan` -> `sendSuccess(200 or 201)`
-  - [ ] Transactions controller flow:
-    - [ ] `GET /api/transactions`: validate filters -> call `sp_get_transactions` -> `sendSuccess(200)`
-    - [ ] `POST /api/transactions`: validate body -> call `sp_add_transaction` -> `sendSuccess(201)`
-    - [ ] `PUT /api/transactions/:id`: validate params/body -> call `sp_update_transaction` -> `sendSuccess(200)`
-    - [ ] `DELETE /api/transactions/:id`: validate params -> call `sp_delete_transaction` -> `sendSuccess(200)`
-  - [ ] Reports controller flow:
-    - [ ] `GET /api/reports/monthly-summary`: validate query -> call `sp_get_monthly_summary` -> `sendSuccess(200)`
-    - [ ] `GET /api/reports/monthly-category-variance`: validate query -> call `sp_get_monthly_category_variance` -> `sendSuccess(200)`
-    - [ ] `GET /api/reports/annual-expense-trend`: validate query -> call `sp_get_annual_expense_trend` -> `sendSuccess(200)`
-  - [ ] Error mapping in controllers/services:
-    - [ ] validation failures -> `400`
-    - [ ] missing records -> `404`
-    - [ ] duplicate/conflict/reference block -> `409`
-    - [ ] unhandled server errors -> `500` with safe message
-- [~] Add validation middleware for required fields and numeric/date checks.
-- [~] Use proper HTTP status codes and avoid leaking stack traces.
+  - [x] Budgets controller flow:
+    - [x] `GET /api/budgets?year=&month=`: validate query -> call `sp_get_budget_plan_by_month` -> `sendSuccess(200)`
+    - [x] `POST /api/budgets/upsert`: validate body -> call `sp_upsert_budget_plan` -> `sendSuccess(200 or 201)`
+  - [x] Transactions controller flow:
+    - [x] `GET /api/transactions`: validate filters -> call `sp_get_transactions` -> `sendSuccess(200)`
+    - [x] `POST /api/transactions`: validate body -> call `sp_add_transaction` -> `sendSuccess(201)`
+    - [x] `PUT /api/transactions/:id`: validate params/body -> call `sp_update_transaction` -> `sendSuccess(200)`
+    - [x] `DELETE /api/transactions/:id`: validate params -> call `sp_delete_transaction` -> `sendSuccess(200)`
+  - [x] Reports controller flow:
+    - [x] `GET /api/reports/monthly-summary`: validate query -> call `sp_get_monthly_summary` -> `sendSuccess(200)`
+    - [x] `GET /api/reports/monthly-category-variance`: validate query -> call `sp_get_monthly_category_variance` -> `sendSuccess(200)`
+    - [x] `GET /api/reports/annual-expense-trend`: validate query -> call `sp_get_annual_expense_trend` -> `sendSuccess(200)`
+  - [x] Error mapping in controllers/services:
+    - [x] validation failures -> `400`
+    - [x] missing records -> `404`
+    - [x] duplicate/conflict/reference block -> `409`
+    - [x] unhandled server errors -> `500` with safe message
+- [x] Add validation middleware for required fields and numeric/date checks.
+- [x] Use proper HTTP status codes and avoid leaking stack traces.
 
 ## Phase 6: Frontend Pages (Multi-Page + Bootstrap + jQuery)
 
@@ -189,22 +189,27 @@ Status Legend:
 
 ## Suggested Build Order (Current Focus)
 
-1. [ ] Accounts + Categories full API + UI integration
-2. [ ] Budget Plans API + UI
-3. [ ] Transactions API + UI
-4. [ ] Dashboard summary integration
-5. [ ] Reports integration
-6. [ ] Hardening + polish + testing
+1. [x] Accounts + Categories API ✅ (Backend complete)
+2. [x] Budget Plans API ✅ (Backend complete)
+3. [x] Transactions API ✅ (Backend complete)
+4. [x] Reports API ✅ (Backend complete)
+5. [ ] Frontend UI Integration - START HERE:
+   - [ ] Accounts UI (list, add, edit, deactivate)
+   - [ ] Categories UI (list, add, edit, deactivate)
+   - [ ] Budgets UI (year/month selector, editable table, save)
+   - [ ] Transactions UI (form, list, filters, edit, delete)
+   - [ ] Dashboard UI (summary cards, variance table)
+   - [ ] Reports UI (annual trend, category variance)
 
 ## User Story Implementation Steps (Requirements.md)
 
 ### US-01: Create accounts
 
-- [ ] Backend:
+- [x] Backend:
   - [x] Route handlers in `src/routes/accounts.routes.js`.
   - [x] Controller methods in `src/controllers/accounts.controller.js`.
   - [x] Service procedure calls in `src/services/accounts.service.js`.
-  - [x] Validate `name`, `accountType`, and `:id` where applicable.
+  - [x] Validate `name`, `accountType`, `openingBalance`, and `:id` where applicable.
 - [ ] Frontend:
   - [ ] Build list + add form on `public/pages/accounts.html`.
   - [ ] Add `public/js/accounts.js` with fetch + DOM rendering.
@@ -214,7 +219,7 @@ Status Legend:
 
 ### US-02: Manage categories
 
-- [ ] Backend:
+- [x] Backend:
   - [x] Route handlers in `src/routes/categories.routes.js`.
   - [x] Controller methods in `src/controllers/categories.controller.js`.
   - [x] Service procedure calls in `src/services/categories.service.js`.
@@ -228,11 +233,11 @@ Status Legend:
 
 ### US-03: Enter monthly planned values
 
-- [ ] Backend:
-  - [ ] Route handlers in `src/routes/budgets.routes.js`.
-  - [ ] Controller methods in `src/controllers/budgets.controller.js`.
-  - [ ] Service calls to `sp_get_budget_plan_by_month` and `sp_upsert_budget_plan`.
-  - [ ] Validate `year`, `month`, `categoryId`, `plannedAmount`.
+- [x] Backend:
+  - [x] Route handlers in `src/routes/budgets.routes.js`.
+  - [x] Controller methods in `src/controllers/budgets.controller.js`.
+  - [x] Service calls to `sp_get_budget_plan_by_month` and `sp_upsert_budget_plan`.
+  - [x] Validate `year`, `month`, `categoryId`, `plannedAmount`.
 - [ ] Frontend:
   - [ ] Build year/month filter and editable budget table in `public/pages/budgets.html`.
   - [ ] Add save flow with upsert behavior.
@@ -242,11 +247,11 @@ Status Legend:
 
 ### US-04: Record daily transactions
 
-- [ ] Backend:
-  - [ ] Route handlers in `src/routes/transactions.routes.js`.
-  - [ ] Controller methods in `src/controllers/transactions.controller.js`.
-  - [ ] Service calls to `sp_add_transaction` and `sp_get_transactions`.
-  - [ ] Validate `txnDate`, `accountId`, `categoryId`, `amount`, `note`.
+- [x] Backend:
+  - [x] Route handlers in `src/routes/transactions.routes.js`.
+  - [x] Controller methods in `src/controllers/transactions.controller.js`.
+  - [x] Service calls to `sp_add_transaction` and `sp_get_transactions`.
+  - [x] Validate `txnDate`, `accountId`, `categoryId`, `amount`, `note`.
 - [ ] Frontend:
   - [ ] Build transaction entry form and list on `public/pages/transactions.html`.
   - [ ] Load account/category options from APIs.
@@ -256,9 +261,9 @@ Status Legend:
 
 ### US-05: Edit incorrect transactions
 
-- [ ] Backend:
-  - [ ] Implement `PUT /api/transactions/:id` and `DELETE /api/transactions/:id`.
-  - [ ] Map not-found and conflict errors to proper status codes.
+- [x] Backend:
+  - [x] Implement `PUT /api/transactions/:id` and `DELETE /api/transactions/:id`.
+  - [x] Map not-found and conflict errors to proper status codes.
 - [ ] Frontend:
   - [ ] Add edit mode and delete action for each transaction row.
   - [ ] Preserve temporary edit state in `sessionStorage` if needed.
@@ -267,9 +272,9 @@ Status Legend:
 
 ### US-06: Compare planned vs actual by month
 
-- [ ] Backend:
-  - [ ] Add report route/controller/service for monthly summary.
-  - [ ] Call `sp_get_monthly_summary` and map response fields clearly.
+- [x] Backend:
+  - [x] Add report route/controller/service for monthly summary.
+  - [x] Call `sp_get_monthly_summary` and map response fields clearly.
 - [ ] Frontend:
   - [ ] Add year/month selectors on `public/pages/dashboard.html`.
   - [ ] Render cards: planned, actual, variance, income, expense, net.
@@ -279,9 +284,9 @@ Status Legend:
 
 ### US-07: Review annual totals/trends
 
-- [ ] Backend:
-  - [ ] Add report endpoints for annual trend and category variance.
-  - [ ] Call `sp_get_annual_expense_trend` and `sp_get_monthly_category_variance`.
+- [x] Backend:
+  - [x] Add report endpoints for annual trend and category variance.
+  - [x] Call `sp_get_annual_expense_trend` and `sp_get_monthly_category_variance`.
 - [ ] Frontend:
   - [ ] Build reports table views on `public/pages/reports.html`.
   - [ ] Return chart-ready JSON shape for future visualization.

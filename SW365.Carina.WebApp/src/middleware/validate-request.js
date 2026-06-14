@@ -151,11 +151,76 @@ function validatePositiveDecimal(fieldName, options) {
   };
 }
 
+function validateNonNegativeDecimal(fieldName, options) {
+  const source = (options && options.source) || 'body';
+
+  return (req) => {
+    const container = req[source] || {};
+    const value = container[fieldName];
+    const parsed = parseFloat(value);
+
+    if (isNaN(parsed)) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be a valid number`
+      };
+    }
+
+    if (parsed < 0) {
+      return {
+        field: fieldName,
+        message: `${fieldName} cannot be negative`
+      };
+    }
+
+    container[fieldName] = parsed;
+    return null;
+  };
+}
+
+function validateDate(fieldName, options = {}) {
+  const source = (options && options.source) || 'body';
+
+  return (req) => {
+    const container = req[source] || {};
+    const raw = container[fieldName];
+
+    if (!raw || typeof raw !== 'string') {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be a valid date string (YYYY-MM-DD)`
+      };
+    }
+
+    // Check format YYYY-MM-DD
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(raw)) {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be in format YYYY-MM-DD`
+      };
+    }
+
+    // Check if valid date
+    const date = new Date(raw);
+    if (isNaN(date.getTime())) {
+      return {
+        field: fieldName,
+        message: `${fieldName} is not a valid date`
+      };
+    }
+
+    return null;
+  };
+}
+
 module.exports = {
   validateRequest,
   validatePositiveIntParam,
   validateRequiredString,
   validateEnumString,
   validatePositiveIntRange,
-  validatePositiveDecimal
+  validatePositiveDecimal,
+  validateNonNegativeDecimal,
+  validateDate
 };

@@ -30,23 +30,24 @@ function unwrapProcedureRows(resultRows) {
 
 async function getAccounts() {
 	const execute = getExecute();
-	const [rows] = await execute('CALL sp_get_accounts()');
+	const [rows] = await execute('CALL sp_get_accounts(?)', [0]);  // 0 = only active, 1 = include inactive
 	return unwrapProcedureRows(rows);
 }
 
-async function addAccount(name, accountType) {
+async function addAccount(name, accountType, openingBalance = 0) {
 	const execute = getExecute();
-	const [rows] = await execute('CALL sp_add_account(?, ?)', [name, accountType]);
+	const [rows] = await execute('CALL sp_add_account(?, ?, ?)', [name, accountType, openingBalance]);
 	const data = unwrapProcedureRows(rows);
 	return data[0] || null;
 }
 
-async function updateAccount(id, name, accountType) {
+async function updateAccount(id, name, accountType, openingBalance = 0) {
 	const execute = getExecute();
-	const [rows] = await execute('CALL sp_update_account(?, ?, ?)', [
+	const [rows] = await execute('CALL sp_update_account(?, ?, ?, ?)', [
 		id,
 		name,
-		accountType
+		accountType,
+		openingBalance
 	]);
 	const data = unwrapProcedureRows(rows);
 	return data[0] || null;
@@ -65,3 +66,6 @@ module.exports = {
 	updateAccount,
 	deactivateAccount
 };
+
+// Note: addAccount(name, accountType, openingBalance = 0)
+// Note: updateAccount(id, name, accountType, openingBalance = 0)

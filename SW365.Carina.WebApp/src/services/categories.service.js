@@ -30,7 +30,7 @@ function unwrapProcedureRows(resultRows) {
 
 async function getCategories() {
 	const execute = getExecute();
-	const [rows] = await execute('CALL sp_get_categories()');
+	const [rows] = await execute('CALL sp_get_categories(?)', [0]);  // 0 = only active, 1 = include inactive
 	return unwrapProcedureRows(rows);
 }
 
