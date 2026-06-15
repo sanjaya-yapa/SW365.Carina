@@ -187,19 +187,127 @@ Status Legend:
   - [ ] what was confusing
   - [ ] what to improve next
 
+## Phase 11: Containerization and Azure Deployment (Minimum Cost / Free Tier)
+
+**Cost Strategy:** Use Azure free tier services + low-cost alternatives where possible.
+
+- [ ] **Docker setup:**
+  - [ ] Create `Dockerfile` for Node.js app with multi-stage build (optimized for small image size).
+  - [ ] Create `.dockerignore` file (exclude `node_modules`, `.git`, logs, `.env`).
+  - [ ] Test Docker build locally: `docker build -t personal-finance:latest .`
+  - [ ] Test Docker run locally: `docker run -p 3000:3000 --env-file .env personal-finance:latest`
+  - [ ] Verify app is accessible on `localhost:3000` inside container.
+
+- [ ] **Azure setup (free tier focused):**
+  - [ ] Create free Azure account (if not already done) - includes $200 free credits for 30 days.
+  - [ ] Create Azure resource group (e.g., `personal-finance-rg`).
+  - [ ] **Option A (LOWEST COST - Recommended):** Azure Container Instances (ACI) + GitHub Container Registry
+    - [ ] Use free GitHub Container Registry (ghcr.io) instead of Azure Container Registry (saves $50-100/month).
+    - [ ] Tag image: `docker tag personal-finance:latest ghcr.io/your-username/personal-finance:latest`
+    - [ ] Push to GitHub Container Registry: `docker push ghcr.io/your-username/personal-finance:latest`
+    - [ ] Deploy to ACI: Create container instance from GitHub Container Registry image (~$10-30/month based on compute time).
+    - [ ] Configure environment variables (`.env` values) in ACI.
+    - [ ] Expose port 3000.
+    - [ ] Note: ACI charges per second of execution (e.g., 1 CPU + 1.5GB RAM = ~$0.015/hour).
+  - [ ] **Option B (COMPLETELY FREE):** Azure App Service on Free Tier (F1)
+    - [ ] Limitation: 1 GB RAM, 1 vCPU shared, 60 CPU min/day limit, no scaling.
+    - [ ] Create App Service Plan on **Free tier (F1)**.
+    - [ ] Create Web App from Docker Container (use GitHub Container Registry).
+    - [ ] Configure application settings (environment variables).
+    - [ ] Test at `https://<app-name>.azurewebsites.net` (App Service provides free HTTPS).
+    - [ ] ⚠️ **Warning:** Free tier may be slow for simultaneous users; suitable for demo/learning only.
+  - [ ] **Option C (HYBRID - Balanced cost):** Azure Container Instances + keep existing MySQL
+    - [ ] Deploy app container to ACI on Basic tier (B0 = ~$7-15/month).
+    - [ ] Keep MySQL on existing server (or use free tier MySQL elsewhere).
+    - [ ] Estimated monthly cost: $15-30 total.
+
+- [ ] **Database (cost optimization):**
+  - [ ] **Option 1 (CHEAPEST):** Keep existing MySQL server (no additional cost).
+  - [ ] **Option 2 (FREE trial):** Azure Database for MySQL - Single Server has limited free tier (~12 months for new accounts, then B1 plan ~$25-50/month).
+  - [ ] **Option 3 (BUDGET):** AWS RDS free tier (similar structure: 12 months free, then pay).
+  - [ ] Recommendation: Keep existing MySQL unless requiring managed backup/HA.
+
+- [ ] **Environment and secrets management (free):**
+  - [ ] Add `.env` to `.gitignore` (already done).
+  - [ ] Use GitHub Secrets for CI/CD pipeline (free for public repos, included in free GitHub account).
+  - [ ] For container secrets: Pass via App Service Application Settings or ACI Environment Variables (free).
+  - [ ] ⚠️ Do NOT commit `.env` to GitHub.
+
+- [ ] **CI/CD Pipeline with GitHub Actions (FREE):**
+  - [ ] GitHub Actions is **free for public repos** (unlimited minutes).
+  - [ ] Create `.github/workflows/deploy.yml` with steps:
+    - [ ] Checkout code
+    - [ ] Build Docker image
+    - [ ] Login to GitHub Container Registry (using `GITHUB_TOKEN`).
+    - [ ] Push to GitHub Container Registry.
+    - [ ] Deploy to Azure (ACI or App Service via Azure CLI).
+  - [ ] Trigger on: push to `main` branch.
+  - [ ] Note: Even if repo is private, GitHub Actions has 2000 free minutes/month per account.
+
+- [ ] **Azure CLI setup (free):**
+  - [ ] Install Azure CLI: `az --version`.
+  - [ ] Login: `az login`.
+  - [ ] Keep Azure CLI commands in deployment scripts (cheaper than manual Azure Portal operations).
+
+- [ ] **Health checks and monitoring (free tier):**
+  - [ ] Add health check endpoint: `GET /health` returns `{ status: 'ok' }`.
+  - [ ] Use free Application Insights tier (1 GB/month free, then $0.50/GB) for logs.
+  - [ ] Or use **free Log Analytics** workspace (5 GB/month free).
+  - [ ] Configure ACI or App Service health probe to monitor `/health`.
+  - [ ] Set up email alerts (free) for errors.
+
+- [ ] **Domain (optional, free options):**
+  - [ ] Use default Azure domain: `<app-name>.azurewebsites.net` (free).
+  - [ ] Or use free `.tk`, `.ml` domains from Freenom (not recommended for production).
+  - [ ] Or point subdomain using free DNS (Cloudflare, Route53).
+
+- [ ] **Documentation (free):**
+  - [ ] Create `DEPLOYMENT.md` with:
+    - [ ] Prerequisites (Azure CLI, Docker, free tier sign-up).
+    - [ ] Step-by-step deployment to ACI or App Service (free tier).
+    - [ ] Environment variables reference.
+    - [ ] **Cost breakdown** (e.g., "ACI: ~$20/month", "App Service F1: $0").
+    - [ ] Troubleshooting guide.
+  - [ ] Document scaling limits and when to upgrade.
+
+- [ ] **Testing in production (free):**
+  - [ ] Verify all API endpoints are reachable.
+  - [ ] Test CRUD operations (create account, add transaction, etc.).
+  - [ ] Verify error handling (404, 409, 400, 500 responses).
+  - [ ] Check that frontend loads and communicates with API.
+  - [ ] Monitor logs using free tier tools (Application Insights or Log Analytics).
+
+- [ ] **Cost summary (monthly estimate):**
+  - [ ] GitHub Container Registry: $0 (free).
+  - [ ] GitHub Actions: $0 (free for public repo).
+  - [ ] **Azure App Service F1 (free tier):** $0 (limited performance).
+  - [ ] **OR Azure Container Instances (B0):** $7-15 (better performance).
+  - [ ] Application Insights (1GB free): $0.
+  - [ ] Existing MySQL: $0 (reuse current server).
+  - [ ] **Total (minimum cost):** $0-15/month (vs. $100+ for production-grade services).
+
 ## Suggested Build Order (Current Focus)
 
 1. [x] Accounts + Categories API ✅ (Backend complete)
 2. [x] Budget Plans API ✅ (Backend complete)
 3. [x] Transactions API ✅ (Backend complete)
 4. [x] Reports API ✅ (Backend complete)
-5. [ ] Frontend UI Integration - START HERE:
+5. [ ] Frontend UI Integration - IN PROGRESS:
    - [ ] Accounts UI (list, add, edit, deactivate)
    - [ ] Categories UI (list, add, edit, deactivate)
    - [ ] Budgets UI (year/month selector, editable table, save)
    - [ ] Transactions UI (form, list, filters, edit, delete)
    - [ ] Dashboard UI (summary cards, variance table)
    - [ ] Reports UI (annual trend, category variance)
+6. [ ] Phase 11: Containerization and Azure Deployment - FUTURE:
+   - [ ] Docker setup (Dockerfile, build, test locally)
+   - [ ] Azure Container Registry (create, push image)
+   - [ ] Azure deployment (App Service or ACI)
+   - [ ] Environment/secrets management
+   - [ ] MySQL connectivity in production
+   - [ ] CI/CD pipeline (GitHub Actions)
+   - [ ] Health checks and monitoring
+   - [ ] Documentation and testing in production
 
 ## User Story Implementation Steps (Requirements.md)
 

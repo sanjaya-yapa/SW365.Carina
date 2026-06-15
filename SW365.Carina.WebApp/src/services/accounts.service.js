@@ -29,35 +29,64 @@ function unwrapProcedureRows(resultRows) {
 }
 
 async function getAccounts() {
-	const execute = getExecute();
-	const [rows] = await execute('CALL sp_get_accounts(?)', [0]);  // 0 = only active, 1 = include inactive
-	return unwrapProcedureRows(rows);
+	try {
+		console.log('🔍 DEBUG: Service calling sp_get_accounts');
+		const execute = getExecute();
+		const [rows] = await execute('CALL sp_get_accounts(?)', [0]);  // 0 = only active, 1 = include inactive
+		const data = unwrapProcedureRows(rows);
+		console.log('✅ DEBUG: Service retrieved', data.length, 'accounts');
+		return data;
+	} catch (err) {
+		console.error('❌ ERROR: Service failed to get accounts', err);
+		throw err;
+	}
 }
 
 async function addAccount(name, accountType, openingBalance = 0) {
-	const execute = getExecute();
-	const [rows] = await execute('CALL sp_add_account(?, ?, ?)', [name, accountType, openingBalance]);
-	const data = unwrapProcedureRows(rows);
-	return data[0] || null;
+	try {
+		console.log('🔍 DEBUG: Service adding account', { name, accountType, openingBalance });
+		const execute = getExecute();
+		const [rows] = await execute('CALL sp_add_account(?, ?, ?)', [name, accountType, openingBalance]);
+		const data = unwrapProcedureRows(rows);
+		console.log('✅ DEBUG: Service successfully added account', data[0]);
+		return data[0] || null;
+	} catch (err) {
+		console.error('❌ ERROR: Service failed to add account', { name, accountType, error: err.message });
+		throw err;
+	}
 }
 
 async function updateAccount(id, name, accountType, openingBalance = 0) {
-	const execute = getExecute();
-	const [rows] = await execute('CALL sp_update_account(?, ?, ?, ?)', [
-		id,
-		name,
-		accountType,
-		openingBalance
-	]);
-	const data = unwrapProcedureRows(rows);
-	return data[0] || null;
+	try {
+		console.log('🔍 DEBUG: Service updating account', { id, name, accountType, openingBalance });
+		const execute = getExecute();
+		const [rows] = await execute('CALL sp_update_account(?, ?, ?, ?)', [
+			id,
+			name,
+			accountType,
+			openingBalance
+		]);
+		const data = unwrapProcedureRows(rows);
+		console.log('✅ DEBUG: Service successfully updated account', data[0]);
+		return data[0] || null;
+	} catch (err) {
+		console.error('❌ ERROR: Service failed to update account', { id, name, accountType, error: err.message });
+		throw err;
+	}
 }
 
 async function deactivateAccount(id) {
-	const execute = getExecute();
-	const [rows] = await execute('CALL sp_deactivate_account(?)', [id]);
-	const data = unwrapProcedureRows(rows);
-	return data[0] || null;
+	try {
+		console.log('🔍 DEBUG: Service deactivating account', { id });
+		const execute = getExecute();
+		const [rows] = await execute('CALL sp_deactivate_account(?)', [id]);
+		const data = unwrapProcedureRows(rows);
+		console.log('✅ DEBUG: Service successfully deactivated account', data[0]);
+		return data[0] || null;
+	} catch (err) {
+		console.error('❌ ERROR: Service failed to deactivate account', { id, error: err.message });
+		throw err;
+	}
 }
 
 module.exports = {

@@ -4,7 +4,7 @@
  */
 
 const API_BASE = '/api/accounts';
-let addModal, editModal;
+let addModal, editModal, deleteConfirmModal;
 let currentAccountId = null;
 
 /**
@@ -215,15 +215,19 @@ async function deleteAccount() {
     return;
   }
 
-  if (!confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
-    return;
-  }
+  // Show the delete confirmation modal
+  deleteConfirmModal.show();
+}
 
+/**
+ * Confirm and proceed with account deletion
+ */
+async function proceedWithDelete() {
   try {
     console.log('🔍 DEBUG: Deleting account', currentAccountId);
 
-    const response = await fetch(`${API_BASE}/${currentAccountId}`, {
-      method: 'DELETE',
+    const response = await fetch(`${API_BASE}/${currentAccountId}/deactivate`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' }
     });
 
@@ -235,6 +239,7 @@ async function deleteAccount() {
 
     console.log('✅ SUCCESS: Account deleted', result.data);
     window.showMessage('Account deleted successfully!', 'success');
+    deleteConfirmModal.hide();
     editModal.hide();
     loadAccounts();
   } catch (error) {
@@ -251,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   addModal = new bootstrap.Modal(document.getElementById('addAccountModal'));
   editModal = new bootstrap.Modal(document.getElementById('editAccountModal'));
+  deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 
   loadAccounts();
 
@@ -267,6 +273,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const deleteAccountBtn = document.getElementById('deleteAccountBtn');
   if (deleteAccountBtn) {
     deleteAccountBtn.addEventListener('click', deleteAccount);
+  }
+
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', proceedWithDelete);
   }
 
   document.getElementById('addAccountForm').addEventListener('keypress', function (e) {

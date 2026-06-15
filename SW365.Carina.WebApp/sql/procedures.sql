@@ -38,7 +38,7 @@ BEGIN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Opening balance cannot be negative';
 	END IF;
 
-	IF p_account_type NOT IN ('CASH', 'BANK', 'CARD', 'EWALLET', 'OTHER') THEN
+	IF p_account_type NOT IN ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account type';
 	END IF;
 
@@ -64,40 +64,40 @@ BEGIN
 END $$
 
 CREATE PROCEDURE sp_update_account(
-	IN p_account_id BIGINT UNSIGNED,
-	IN p_account_name VARCHAR(100),
-	IN p_account_type VARCHAR(20),
-	IN p_opening_balance DECIMAL(12, 2)
+    IN p_account_id BIGINT UNSIGNED,
+    IN p_account_name VARCHAR(100),
+    IN p_account_type VARCHAR(20),
+    IN p_opening_balance DECIMAL(12, 2)
 )
 BEGIN
-	IF p_account_id IS NULL OR p_account_id = 0 THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Valid account ID is required';
-	END IF;
+    IF p_account_id IS NULL OR p_account_id = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Valid account ID is required';
+    END IF;
 
-	IF p_account_name IS NULL OR TRIM(p_account_name) = '' THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account name is required';
-	END IF;
+    IF p_account_name IS NULL OR TRIM(p_account_name) = '' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account name is required';
+    END IF;
 
-	IF p_opening_balance < 0 THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Opening balance cannot be negative';
-	END IF;
+    IF p_opening_balance < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Opening balance cannot be negative';
+    END IF;
 
-	IF p_account_type NOT IN ('CASH', 'BANK', 'CARD', 'EWALLET', 'OTHER') THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account type';
-	END IF;
+    IF p_account_type NOT IN ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account type';
+    END IF;
 
-	IF NOT EXISTS (SELECT 1 FROM accounts WHERE account_id = p_account_id) THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account not found';
-	END IF;
+    IF NOT EXISTS (SELECT 1 FROM accounts WHERE account_id = p_account_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Account not found';
+    END IF;
 
-	UPDATE accounts
-	SET
-		account_name = TRIM(p_account_name),
-		account_type = p_account_type,
-		opening_balance = p_opening_balance
-	WHERE account_id = p_account_id;
+    UPDATE accounts
+    SET
+        account_name = TRIM(p_account_name),
+        account_type = p_account_type,
+        opening_balance = p_opening_balance
+    WHERE account_id = p_account_id;
 
-	SELECT ROW_COUNT() AS affectedRows;
+    SELECT ROW_COUNT() AS affectedRows;
 END $$
 
 CREATE PROCEDURE sp_deactivate_account(IN p_account_id BIGINT UNSIGNED)
@@ -540,3 +540,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- Note: You may need to run this to expand the account_type column in your accounts table:
+-- ALTER TABLE accounts MODIFY account_type VARCHAR(20);
+-- This is needed because DIRECT_DEBIT has 12 characters and old column might be VARCHAR(10) or similar.
