@@ -26,6 +26,7 @@ The MVP should support the core budgeting flow that is commonly represented in a
 
 - User can create, view, update, and deactivate accounts.
 - Each transaction belongs to one account.
+- Account type should distinguish everyday cash/card accounts from savings, investment, and loan accounts.
 
 ### FR-02 Categories
 
@@ -92,11 +93,12 @@ The MVP should support the core budgeting flow that is commonly represented in a
 6. As a budget owner, I want to compare planned vs actual by month so I can control spending.
 7. As a budget owner, I want to see annual totals so I can review long-term trends.
 8. As a budget owner, I want meaningful validation errors so I can quickly fix input mistakes.
+9. As a budget owner, I want to classify savings and investment accounts separately so I can understand where my money is held and separate everyday spending from long-term assets.
 
 ### Data Safety Stories
 
-9. As a budget owner, I want protected delete behavior so historical data is not broken.
-10. As a budget owner, I want backend validation so invalid or unsafe data cannot be saved.
+10. As a budget owner, I want protected delete behavior so historical data is not broken.
+11. As a budget owner, I want backend validation so invalid or unsafe data cannot be saved.
 
 ## 6) Acceptance Criteria (MVP)
 
@@ -107,6 +109,7 @@ The MVP should support the core budgeting flow that is commonly represented in a
 5. API returns proper status codes (`200`, `201`, `400`, `404`, `409`, `500`).
 6. Stored procedures are used for create/update/get business operations.
 7. Linting and formatting checks pass.
+8. User can create and edit accounts using account types that include savings and investment accounts.
 
 ## 7) Assumptions
 
@@ -176,3 +179,4 @@ Record uncertain or missing workbook details here before coding:
 |---|---|---|---|---|
 | Unknown sheet columns | Wrong DB design | Confirm workbook columns before schema freeze | Product/Dev | Open |
 | Ambiguous variance formula | Incorrect reporting | Validate formula with one sample month | Dev | Open |
+| Account type taxonomy | Savings and investments are forced into vague account categories | Add explicit account types such as `SAVINGS`, `TRANSACTION_ACCOUNT`, `INVESTMENT`, and `LOAN` | Product/Dev | Open |
