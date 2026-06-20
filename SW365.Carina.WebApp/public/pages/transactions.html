@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,46 +18,39 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          <i class="bi bi-wallet2 me-2"></i>Personal Finance
-        </a>
+        <a class="navbar-brand" href="/"><i class="bi bi-wallet2 me-2"></i>Personal Finance</a>
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="bi bi-house-door me-1"></i>Home
-              </a>
+              <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/dashboard.html">
-                <i class="bi bi-bar-chart me-1"></i>Dashboard
-              </a>
+              <a class="nav-link" href="/pages/dashboard.html"
+                ><i class="bi bi-bar-chart me-1"></i>Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/accounts.html">
-                <i class="bi bi-credit-card me-1"></i>Accounts
-              </a>
+              <a class="nav-link" href="/pages/accounts.html"
+                ><i class="bi bi-credit-card me-1"></i>Accounts</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/categories.html">
-                <i class="bi bi-tags me-1"></i>Categories
-              </a>
+              <a class="nav-link" href="/pages/categories.html"
+                ><i class="bi bi-tags me-1"></i>Categories</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/budgets.html">
-                <i class="bi bi-calculator me-1"></i>Budgets
-              </a>
+              <a class="nav-link" href="/pages/budgets.html"
+                ><i class="bi bi-calculator me-1"></i>Budgets</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link active" href="/pages/transactions.html">
@@ -65,22 +58,185 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/reports.html">
-                <i class="bi bi-file-earmark-text me-1"></i>Reports
-              </a>
+              <a class="nav-link" href="/pages/reports.html"
+                ><i class="bi bi-file-earmark-text me-1"></i>Reports</a
+              >
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <div class="container py-4">
-      <h1 class="h3">Transactions</h1>
-      <p class="text-muted">Page scaffold ready.</p>
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+      <div class="mb-4">
+        <h1 class="h3 mb-1">Transactions</h1>
+        <p class="text-muted mb-0">Record daily income and expense activity.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h4 class="card-title h5 mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Add Transaction
+              </h4>
+            </div>
+            <div class="card-body">
+              <form id="transactionForm" novalidate>
+                <div class="mb-3">
+                  <label for="txnDate" class="form-label"
+                    >Date <span class="text-danger">*</span></label
+                  >
+                  <input type="date" class="form-control" id="txnDate" required />
+                  <div class="invalid-feedback">Please enter a transaction date.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="accountId" class="form-label"
+                    >Account <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" id="accountId" required>
+                    <option value="">-- Select Account --</option>
+                  </select>
+                  <div class="invalid-feedback">Please select an account.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="categoryId" class="form-label"
+                    >Category <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" id="categoryId" required>
+                    <option value="">-- Select Category --</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a category.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="amount" class="form-label"
+                    >Amount <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="amount"
+                    min="0.01"
+                    step="0.01"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter an amount greater than zero.</div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="note" class="form-label">Note</label>
+                  <input type="text" class="form-control" id="note" maxlength="255" />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">
+                  <i class="bi bi-check-circle me-1"></i>Save Transaction
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="d-flex flex-column flex-xl-row justify-content-between gap-3 mb-3">
+            <form class="row gy-2 gx-2 align-items-end" id="transactionFilterForm">
+              <div class="col-6 col-md-auto">
+                <label for="filterYear" class="form-label mb-1">Year</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="filterYear"
+                  min="2000"
+                  max="2100"
+                  required
+                />
+              </div>
+              <div class="col-6 col-md-auto">
+                <label for="filterMonth" class="form-label mb-1">Month</label>
+                <select class="form-select" id="filterMonth" required>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-auto">
+                <label for="filterAccountId" class="form-label mb-1">Account</label>
+                <select class="form-select" id="filterAccountId">
+                  <option value="">All Accounts</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-auto">
+                <label for="filterCategoryId" class="form-label mb-1">Category</label>
+                <select class="form-select" id="filterCategoryId">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-auto">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="bi bi-search me-1"></i>Load
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+            <div class="text-muted" id="transactionSummary">Loading transactions...</div>
+            <div class="fw-semibold" id="transactionTotals"></div>
+          </div>
+
+          <div class="table-responsive border rounded">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Account</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Type</th>
+                  <th scope="col" class="text-end">Amount</th>
+                  <th scope="col">Note</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsTableBody"></tbody>
+            </table>
+          </div>
+          <div
+            class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3"
+            id="paginationControls"
+          >
+            <div class="d-flex align-items-center gap-2">
+              <label for="pageSizeSelect" class="form-label mb-0 text-muted">Rows per page</label>
+              <select class="form-select form-select-sm" id="pageSizeSelect" style="width: auto">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <nav aria-label="Transactions pagination">
+              <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
+            </nav>
+          </div>
+          <p class="text-muted text-center mt-4 mb-0 d-none" id="emptyMessage"></p>
+        </div>
+      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/transactions.js"></script>
   </body>
 </html>

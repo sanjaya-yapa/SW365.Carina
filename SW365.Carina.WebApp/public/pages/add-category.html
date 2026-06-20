@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Accounts - Personal Finance</title>
+    <title>Add Category - Personal Finance</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -38,12 +38,12 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/pages/accounts.html"
+              <a class="nav-link" href="/pages/accounts.html"
                 ><i class="bi bi-credit-card me-1"></i>Accounts</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/categories.html"
+              <a class="nav-link active" href="/pages/categories.html"
                 ><i class="bi bi-tags me-1"></i>Categories</a
               >
             </li>
@@ -68,31 +68,62 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container py-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Accounts</h1>
-        <a href="/pages/add-account.html" class="btn btn-success">
-          <i class="bi bi-plus-circle me-1"></i>Add Account
+    <div class="container py-4" style="max-width: 600px">
+      <div class="mb-4">
+        <a href="/pages/categories.html" class="btn btn-outline-secondary">
+          <i class="bi bi-chevron-left me-1"></i>Back to Categories
         </a>
       </div>
 
-      <div class="btn-group mb-4" role="group" aria-label="Account view selector">
-        <button type="button" class="btn btn-primary" id="activeAccountsBtn">
-          <i class="bi bi-check-circle me-1"></i>Active
-        </button>
-        <button type="button" class="btn btn-outline-primary" id="deletedAccountsBtn">
-          <i class="bi bi-archive me-1"></i>Deleted
-        </button>
-      </div>
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="card-title mb-0"><i class="bi bi-plus-circle me-2"></i>Add New Category</h4>
+        </div>
+        <div class="card-body">
+          <form id="addCategoryForm" novalidate>
+            <div class="mb-3">
+              <label for="addName" class="form-label"
+                >Category Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="addName"
+                name="name"
+                placeholder="e.g., Groceries"
+                required
+              />
+              <div class="invalid-feedback">Please enter a category name.</div>
+            </div>
 
-      <!-- Accounts Grid -->
-      <div class="row g-4" id="accountsGrid"></div>
-      <p class="text-muted text-center mt-5 mb-0" id="emptyMessage">Loading accounts...</p>
+            <div class="mb-4">
+              <label for="addType" class="form-label"
+                >Category Type <span class="text-danger">*</span></label
+              >
+              <select class="form-select" id="addType" name="categoryType" required>
+                <option value="">-- Select Type --</option>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+              <div class="invalid-feedback">Please select a category type.</div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="/pages/categories.html" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-1"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle me-1"></i>Create Category
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
-    <script src="/js/accounts.js"></script>
+    <script src="/js/add-category.js"></script>
   </body>
 </html>

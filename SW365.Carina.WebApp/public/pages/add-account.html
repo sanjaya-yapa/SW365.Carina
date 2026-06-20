@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Account - Personal Finance</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"><i class="bi bi-wallet2 me-2"></i>Personal Finance</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/dashboard.html"><i class="bi bi-bar-chart me-1"></i>Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/accounts.html"><i class="bi bi-credit-card me-1"></i>Accounts</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/categories.html"><i class="bi bi-tags me-1"></i>Categories</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/budgets.html"><i class="bi bi-calculator me-1"></i>Budgets</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/transactions.html"><i class="bi bi-arrow-left-right me-1"></i>Transactions</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/reports.html"><i class="bi bi-file-earmark-text me-1"></i>Reports</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4" style="max-width: 600px;">
+      <div class="mb-4">
+        <a href="/pages/accounts.html" class="btn btn-outline-secondary">
+          <i class="bi bi-chevron-left me-1"></i>Back to Accounts
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="card-title mb-0"><i class="bi bi-plus-circle me-2"></i>Add New Account</h4>
+        </div>
+        <div class="card-body">
+          <form id="addAccountForm" novalidate>
+            <div class="mb-3">
+              <label for="addName" class="form-label">Account Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="addName" name="name" placeholder="e.g., My Savings" required />
+              <div class="invalid-feedback">Please enter an account name.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="addType" class="form-label">Account Type <span class="text-danger">*</span></label>
+              <select class="form-select" id="addType" name="accountType" required>
+                <option value="">-- Select Type --</option>
+                <option value="CASH">Cash</option>
+                <option value="CREDIT_CARD">Credit Card</option>
+                <option value="DEBIT_CARD">Debit Card</option>
+                <option value="DIRECT_DEBIT">Direct Debit</option>
+              </select>
+              <div class="invalid-feedback">Please select an account type.</div>
+            </div>
+
+            <div class="mb-4">
+              <label for="addBalance" class="form-label">Opening Balance</label>
+              <input type="number" class="form-control" id="addBalance" name="openingBalance" step="0.01" min="0" value="0" />
+              <small class="form-text text-muted">Starting balance for this account</small>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="/pages/accounts.html" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-1"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle me-1"></i>Create Account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/add-account.js"></script>
+  </body>
+</html>

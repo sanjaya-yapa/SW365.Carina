@@ -541,6 +541,5 @@ END $$
 
 DELIMITER ;
 
--- Note: You may need to run this to expand the account_type column in your accounts table:
--- ALTER TABLE accounts MODIFY account_type VARCHAR(20);
--- This is needed because DIRECT_DEBIT has 12 characters and old column might be VARCHAR(10) or similar.
+-- Note: If you already created the database with the old account_type enum, run:
+-- ALTER TABLE accounts MODIFY account_type ENUM('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') NOT NULL DEFAULT 'CASH';

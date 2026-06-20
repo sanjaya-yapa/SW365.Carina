@@ -1,41 +1,51 @@
 const express = require('express');
 const accountsController = require('../controllers/accounts.controller');
 const {
-	validateRequest,
-	validatePositiveIntParam,
-	validateRequiredString,
-	validateEnumString,
-	validateNonNegativeDecimal
+  validateRequest,
+  validatePositiveIntParam,
+  validateRequiredString,
+  validateEnumString,
+  validateNonNegativeDecimal,
 } = require('../middleware/validate-request');
 
 const router = express.Router();
 
 // New types for creation
 const accountBodyValidators = [
-	validateRequiredString('name', { maxLength: 100 }),
-	validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
-	validateNonNegativeDecimal('openingBalance')
+  validateRequiredString('name', { maxLength: 100 }),
+  validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
+  validateNonNegativeDecimal('openingBalance'),
 ];
 
 router.get('/', accountsController.getAccounts);
+router.get(
+  '/:id',
+  validateRequest(validatePositiveIntParam('id')),
+  accountsController.getAccountById
+);
 router.post('/', validateRequest(accountBodyValidators), accountsController.createAccount);
 
 // Update validators
 const accountUpdateValidators = [
-	validateRequiredString('name', { maxLength: 100 }),
-	validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
-	validateNonNegativeDecimal('openingBalance')
+  validateRequiredString('name', { maxLength: 100 }),
+  validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
+  validateNonNegativeDecimal('openingBalance'),
 ];
 
 router.put(
-	'/:id',
-	validateRequest([validatePositiveIntParam('id'), ...accountUpdateValidators]),
-	accountsController.updateAccount
+  '/:id',
+  validateRequest([validatePositiveIntParam('id'), ...accountUpdateValidators]),
+  accountsController.updateAccount
 );
 router.patch(
-	'/:id/deactivate',
-	validateRequest(validatePositiveIntParam('id')),
-	accountsController.deactivateAccount
+  '/:id/deactivate',
+  validateRequest(validatePositiveIntParam('id')),
+  accountsController.deactivateAccount
+);
+router.patch(
+  '/:id/reactivate',
+  validateRequest(validatePositiveIntParam('id')),
+  accountsController.reactivateAccount
 );
 
 module.exports = router;

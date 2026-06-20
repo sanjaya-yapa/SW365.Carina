@@ -1,4 +1,3 @@
-
 /**
  * Display a temporary alert message on the page
  * @param {string} message - Message text to display
@@ -7,7 +6,7 @@
  */
 window.showMessage = function showMessage(message, type = 'info', duration = 5000) {
   const alertType = ['success', 'danger', 'warning'].includes(type) ? type : 'info';
-  
+
   // Create alert container if it doesn't exist
   let container = document.getElementById('alert-container');
   if (!container) {
@@ -24,10 +23,15 @@ window.showMessage = function showMessage(message, type = 'info', duration = 500
   alert.id = alertId;
   alert.className = `alert alert-${alertType} alert-dismissible fade show`;
   alert.setAttribute('role', 'alert');
-  alert.innerHTML = `
-    ${message}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  `;
+
+  const messageText = document.createTextNode(message);
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'btn-close';
+  closeButton.setAttribute('data-bs-dismiss', 'alert');
+  closeButton.setAttribute('aria-label', 'Close');
+
+  alert.append(messageText, closeButton);
 
   container.appendChild(alert);
 

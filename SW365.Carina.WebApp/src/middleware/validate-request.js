@@ -24,7 +24,7 @@ function validatePositiveIntParam(paramName) {
     if (!Number.isInteger(parsed) || parsed <= 0) {
       return {
         field: paramName,
-        message: `${paramName} must be a positive integer`
+        message: `${paramName} must be a positive integer`,
       };
     }
 
@@ -45,7 +45,7 @@ function validateRequiredString(fieldName, options) {
     if (typeof value !== 'string') {
       return {
         field: fieldName,
-        message: `${fieldName} is required`
+        message: `${fieldName} is required`,
       };
     }
 
@@ -53,14 +53,14 @@ function validateRequiredString(fieldName, options) {
     if (!trimmed) {
       return {
         field: fieldName,
-        message: `${fieldName} is required`
+        message: `${fieldName} is required`,
       };
     }
 
     if (trimmed.length > maxLength) {
       return {
         field: fieldName,
-        message: `${fieldName} must be ${maxLength} characters or less`
+        message: `${fieldName} must be ${maxLength} characters or less`,
       };
     }
 
@@ -80,7 +80,7 @@ function validateEnumString(fieldName, allowedValues, options) {
     if (typeof value !== 'string') {
       return {
         field: fieldName,
-        message: `${fieldName} is required`
+        message: `${fieldName} is required`,
       };
     }
 
@@ -88,7 +88,7 @@ function validateEnumString(fieldName, allowedValues, options) {
     if (!allowed.includes(normalized)) {
       return {
         field: fieldName,
-        message: `${fieldName} must be one of: ${allowed.join(', ')}`
+        message: `${fieldName} must be one of: ${allowed.join(', ')}`,
       };
     }
 
@@ -108,14 +108,14 @@ function validatePositiveIntRange(fieldName, min, max, options) {
     if (!Number.isInteger(parsed)) {
       return {
         field: fieldName,
-        message: `${fieldName} must be an integer`
+        message: `${fieldName} must be an integer`,
       };
     }
 
     if (parsed < min || parsed > max) {
       return {
         field: fieldName,
-        message: `${fieldName} must be between ${min} and ${max}`
+        message: `${fieldName} must be between ${min} and ${max}`,
       };
     }
 
@@ -130,19 +130,19 @@ function validatePositiveDecimal(fieldName, options) {
   return (req) => {
     const container = req[source] || {};
     const value = container[fieldName];
-    const parsed = parseFloat(value);
+    const parsed = Number(value);
 
-    if (isNaN(parsed)) {
+    if (!Number.isFinite(parsed)) {
       return {
         field: fieldName,
-        message: `${fieldName} must be a valid number`
+        message: `${fieldName} must be a valid number`,
       };
     }
 
     if (parsed <= 0) {
       return {
         field: fieldName,
-        message: `${fieldName} must be greater than 0`
+        message: `${fieldName} must be greater than 0`,
       };
     }
 
@@ -157,19 +157,19 @@ function validateNonNegativeDecimal(fieldName, options) {
   return (req) => {
     const container = req[source] || {};
     const value = container[fieldName];
-    const parsed = parseFloat(value);
+    const parsed = Number(value);
 
-    if (isNaN(parsed)) {
+    if (!Number.isFinite(parsed)) {
       return {
         field: fieldName,
-        message: `${fieldName} must be a valid number`
+        message: `${fieldName} must be a valid number`,
       };
     }
 
     if (parsed < 0) {
       return {
         field: fieldName,
-        message: `${fieldName} cannot be negative`
+        message: `${fieldName} cannot be negative`,
       };
     }
 
@@ -188,7 +188,7 @@ function validateDate(fieldName, options = {}) {
     if (!raw || typeof raw !== 'string') {
       return {
         field: fieldName,
-        message: `${fieldName} must be a valid date string (YYYY-MM-DD)`
+        message: `${fieldName} must be a valid date string (YYYY-MM-DD)`,
       };
     }
 
@@ -197,7 +197,7 @@ function validateDate(fieldName, options = {}) {
     if (!dateRegex.test(raw)) {
       return {
         field: fieldName,
-        message: `${fieldName} must be in format YYYY-MM-DD`
+        message: `${fieldName} must be in format YYYY-MM-DD`,
       };
     }
 
@@ -206,7 +206,7 @@ function validateDate(fieldName, options = {}) {
     if (isNaN(date.getTime())) {
       return {
         field: fieldName,
-        message: `${fieldName} is not a valid date`
+        message: `${fieldName} is not a valid date`,
       };
     }
 
@@ -222,5 +222,5 @@ module.exports = {
   validatePositiveIntRange,
   validatePositiveDecimal,
   validateNonNegativeDecimal,
-  validateDate
+  validateDate,
 };

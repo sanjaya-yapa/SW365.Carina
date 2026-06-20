@@ -46,15 +46,27 @@ function unwrapProcedureRows(resultRows) {
  */
 async function getTransactions(txnMonth, txnYear, accountId = null, categoryId = null) {
   try {
-    console.log('🔍 DEBUG: getTransactions called with:', { txnMonth, txnYear, accountId, categoryId });
+    console.log('🔍 DEBUG: getTransactions called with:', {
+      txnMonth,
+      txnYear,
+      accountId,
+      categoryId,
+    });
     const execute = getExecute();
     console.log('✅ DEBUG: Database executor obtained');
 
-    console.log('🔍 DEBUG: Calling sp_get_transactions with params:', [txnYear, txnMonth, accountId, categoryId]);
-    const [rows] = await execute(
-      'CALL sp_get_transactions(?, ?, ?, ?)',
-      [txnYear, txnMonth, accountId, categoryId]
-    );
+    console.log('🔍 DEBUG: Calling sp_get_transactions with params:', [
+      txnYear,
+      txnMonth,
+      accountId,
+      categoryId,
+    ]);
+    const [rows] = await execute('CALL sp_get_transactions(?, ?, ?, ?)', [
+      txnYear,
+      txnMonth,
+      accountId,
+      categoryId,
+    ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -66,10 +78,41 @@ async function getTransactions(txnMonth, txnYear, accountId = null, categoryId =
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
+}
+
+async function getTransactionById(id) {
+  const execute = getExecute();
+  const [rows] = await execute(
+    `SELECT
+      t.transaction_id,
+      t.txn_date,
+      t.account_id,
+      a.account_name,
+      t.category_id,
+      c.category_name,
+      c.category_type,
+      t.amount,
+      t.note,
+      t.created_at,
+      t.updated_at
+    FROM transactions t
+    INNER JOIN accounts a ON a.account_id = t.account_id
+    INNER JOIN categories c ON c.category_id = t.category_id
+    WHERE t.transaction_id = ?
+    LIMIT 1`,
+    [id]
+  );
+
+  const transaction = Array.isArray(rows) ? rows[0] : null;
+  if (!transaction) {
+    throw new Error('Transaction not found');
+  }
+
+  return transaction;
 }
 
 /**
@@ -83,15 +126,30 @@ async function getTransactions(txnMonth, txnYear, accountId = null, categoryId =
  */
 async function addTransaction(txnDate, accountId, categoryId, amount, note = null) {
   try {
-    console.log('🔍 DEBUG: addTransaction called with:', { txnDate, accountId, categoryId, amount, note });
+    console.log('🔍 DEBUG: addTransaction called with:', {
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    });
     const execute = getExecute();
     console.log('✅ DEBUG: Database executor obtained');
 
-    console.log('🔍 DEBUG: Calling sp_add_transaction with params:', [txnDate, accountId, categoryId, amount, note]);
-    const [rows] = await execute(
-      'CALL sp_add_transaction(?, ?, ?, ?, ?)',
-      [txnDate, accountId, categoryId, amount, note]
-    );
+    console.log('🔍 DEBUG: Calling sp_add_transaction with params:', [
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    ]);
+    const [rows] = await execute('CALL sp_add_transaction(?, ?, ?, ?, ?)', [
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -103,7 +161,7 @@ async function addTransaction(txnDate, accountId, categoryId, amount, note = nul
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
@@ -121,15 +179,33 @@ async function addTransaction(txnDate, accountId, categoryId, amount, note = nul
  */
 async function updateTransaction(id, txnDate, accountId, categoryId, amount, note = null) {
   try {
-    console.log('🔍 DEBUG: updateTransaction called with:', { id, txnDate, accountId, categoryId, amount, note });
+    console.log('🔍 DEBUG: updateTransaction called with:', {
+      id,
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    });
     const execute = getExecute();
     console.log('✅ DEBUG: Database executor obtained');
 
-    console.log('🔍 DEBUG: Calling sp_update_transaction with params:', [id, txnDate, accountId, categoryId, amount, note]);
-    const [rows] = await execute(
-      'CALL sp_update_transaction(?, ?, ?, ?, ?, ?)',
-      [id, txnDate, accountId, categoryId, amount, note]
-    );
+    console.log('🔍 DEBUG: Calling sp_update_transaction with params:', [
+      id,
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    ]);
+    const [rows] = await execute('CALL sp_update_transaction(?, ?, ?, ?, ?, ?)', [
+      id,
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -141,7 +217,7 @@ async function updateTransaction(id, txnDate, accountId, categoryId, amount, not
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
@@ -159,10 +235,7 @@ async function deleteTransaction(id) {
     console.log('✅ DEBUG: Database executor obtained');
 
     console.log('🔍 DEBUG: Calling sp_delete_transaction with params:', [id]);
-    const [rows] = await execute(
-      'CALL sp_delete_transaction(?)',
-      [id]
-    );
+    const [rows] = await execute('CALL sp_delete_transaction(?)', [id]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -174,7 +247,7 @@ async function deleteTransaction(id) {
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
@@ -182,7 +255,8 @@ async function deleteTransaction(id) {
 
 module.exports = {
   getTransactions,
+  getTransactionById,
   addTransaction,
   updateTransaction,
-  deleteTransaction
+  deleteTransaction,
 };

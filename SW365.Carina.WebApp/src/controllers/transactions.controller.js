@@ -45,6 +45,18 @@ async function getTransactions(req, res) {
   }
 }
 
+async function getTransactionById(req, res) {
+  try {
+    const { id } = req.params;
+    const transaction = await transactionsService.getTransactionById(id);
+
+    return sendSuccess(res, transaction, 'Transaction retrieved successfully', 200);
+  } catch (err) {
+    const mapped = mapServiceError(err);
+    return sendError(res, mapped.message, null, mapped.statusCode);
+  }
+}
+
 /**
  * POST /api/transactions
  * Create a new transaction
@@ -53,7 +65,13 @@ async function getTransactions(req, res) {
 async function createTransaction(req, res) {
   try {
     const { txnDate, accountId, categoryId, amount, note } = req.body;
-    console.log('🔍 DEBUG: Controller received body:', { txnDate, accountId, categoryId, amount, note });
+    console.log('🔍 DEBUG: Controller received body:', {
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    });
 
     const result = await transactionsService.addTransaction(
       txnDate,
@@ -80,7 +98,14 @@ async function updateTransaction(req, res) {
   try {
     const { id } = req.params;
     const { txnDate, accountId, categoryId, amount, note } = req.body;
-    console.log('🔍 DEBUG: Controller received params/body:', { id, txnDate, accountId, categoryId, amount, note });
+    console.log('🔍 DEBUG: Controller received params/body:', {
+      id,
+      txnDate,
+      accountId,
+      categoryId,
+      amount,
+      note,
+    });
 
     const result = await transactionsService.updateTransaction(
       id,
@@ -120,7 +145,8 @@ async function deleteTransaction(req, res) {
 
 module.exports = {
   getTransactions,
+  getTransactionById,
   createTransaction,
   updateTransaction,
-  deleteTransaction
+  deleteTransaction,
 };

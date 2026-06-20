@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,46 +18,39 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          <i class="bi bi-wallet2 me-2"></i>Personal Finance
-        </a>
+        <a class="navbar-brand" href="/"><i class="bi bi-wallet2 me-2"></i>Personal Finance</a>
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="bi bi-house-door me-1"></i>Home
-              </a>
+              <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/dashboard.html">
-                <i class="bi bi-bar-chart me-1"></i>Dashboard
-              </a>
+              <a class="nav-link" href="/pages/dashboard.html"
+                ><i class="bi bi-bar-chart me-1"></i>Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/accounts.html">
-                <i class="bi bi-credit-card me-1"></i>Accounts
-              </a>
+              <a class="nav-link" href="/pages/accounts.html"
+                ><i class="bi bi-credit-card me-1"></i>Accounts</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/categories.html">
-                <i class="bi bi-tags me-1"></i>Categories
-              </a>
+              <a class="nav-link" href="/pages/categories.html"
+                ><i class="bi bi-tags me-1"></i>Categories</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/pages/budgets.html">
-                <i class="bi bi-calculator me-1"></i>Budgets
-              </a>
+              <a class="nav-link active" href="/pages/budgets.html"
+                ><i class="bi bi-calculator me-1"></i>Budgets</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/pages/transactions.html">
@@ -65,22 +58,90 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/pages/reports.html">
-                <i class="bi bi-file-earmark-text me-1"></i>Reports
-              </a>
+              <a class="nav-link" href="/pages/reports.html"
+                ><i class="bi bi-file-earmark-text me-1"></i>Reports</a
+              >
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <div class="container py-4">
-      <h1 class="h3">Budgets</h1>
-      <p class="text-muted">Page scaffold ready.</p>
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+      <div
+        class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4"
+      >
+        <div>
+          <h1 class="h3 mb-1">Monthly Budget Plan</h1>
+          <p class="text-muted mb-0">Enter planned values by category for the selected month.</p>
+        </div>
+
+        <form class="row gy-2 gx-2 align-items-end" id="budgetFilterForm">
+          <div class="col-6 col-md-auto">
+            <label for="budgetYear" class="form-label mb-1">Year</label>
+            <input
+              type="number"
+              class="form-control"
+              id="budgetYear"
+              min="2000"
+              max="2100"
+              required
+            />
+          </div>
+          <div class="col-6 col-md-auto">
+            <label for="budgetMonth" class="form-label mb-1">Month</label>
+            <select class="form-select" id="budgetMonth" required>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-auto">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-search me-1"></i>Load
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="text-muted" id="budgetSummary">Loading budget grid...</div>
+        <button type="button" class="btn btn-success" id="saveBudgetBtn">
+          <i class="bi bi-save me-1"></i>Save All
+        </button>
+      </div>
+
+      <div class="table-responsive border rounded">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Plan ID</th>
+              <th scope="col">Category</th>
+              <th scope="col">Type</th>
+              <th scope="col" style="min-width: 180px">Planned Amount</th>
+              <th scope="col" style="min-width: 260px">Note</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="budgetGridBody"></tbody>
+        </table>
+      </div>
+      <p class="text-muted text-center mt-4 mb-0 d-none" id="emptyMessage"></p>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/budgets.js"></script>
   </body>
 </html>
