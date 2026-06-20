@@ -12,7 +12,6 @@ Status Legend:
 - [~] Mark which values are input fields vs calculated fields.
 - [x] Create a mapping table: `Workbook Field -> Database Column -> API Field -> UI Field`.
 - [~] Confirm business rules (e.g., variance formula, month format, category type).
-- [ ] Confirm account type taxonomy for savings, investment, loan, and everyday transaction accounts.
 
 ## Phase 1: Project Infrastructure Setup
 
@@ -295,9 +294,9 @@ Status Legend:
 4. [x] Reports API ✅ (Backend complete)
 5. [ ] Frontend UI Integration - IN PROGRESS:
    - [x] Accounts UI (list, add, edit, deactivate)
-   - [ ] Categories UI (list, add, edit, deactivate)
-   - [ ] Budgets UI (year/month selector, editable table, save)
-   - [ ] Transactions UI (form, list, filters, edit, delete)
+   - [x] Categories UI (list, add, edit, deactivate)
+   - [x] Budgets UI (year/month selector, editable table, save)
+   - [x] Transactions UI (form, list, filters, edit, delete)
    - [ ] Dashboard UI (summary cards, variance table)
    - [ ] Reports UI (annual trend, category variance)
 6. [ ] Phase 11: Containerization and Azure Deployment - FUTURE:
@@ -324,8 +323,8 @@ Status Legend:
   - [x] Create standalone add page `public/pages/add-account.html` (mobile-friendly, no modals).
   - [x] Add `public/js/add-account.js` with form submission and redirect.
   - [x] Show result using `window.showMessage()`.
-- [ ] Test:
-  - [ ] Add account (valid), add account (invalid), verify mobile layout, edit, deactivate.
+- [x] Test:
+  - [x] Add account (valid), add account (invalid), verify mobile layout, edit, deactivate.
 
 ### US-02: Manage categories
 
@@ -334,12 +333,12 @@ Status Legend:
   - [x] Controller methods in `src/controllers/categories.controller.js`.
   - [x] Service procedure calls in `src/services/categories.service.js`.
   - [x] Validate `name`, `categoryType` (`INCOME|EXPENSE`), and `:id`.
-- [ ] Frontend:
-  - [ ] Build list + add/edit/deactivate UI on `public/pages/categories.html`.
-  - [ ] Add `public/js/categories.js` with API integration.
-  - [ ] Show validation and API errors via `window.showMessage()`.
-- [ ] Test:
-  - [ ] Verify category type rules and deactivate protection behavior.
+- [x] Frontend:
+  - [x] Build list + add/edit/deactivate UI on `public/pages/categories.html`.
+  - [x] Add `public/js/categories.js` with API integration.
+  - [x] Show validation and API errors via `window.showMessage()`.
+- [x] Test:
+  - [x] Verify category type rules and deactivate protection behavior.
 
 ### US-03: Enter monthly planned values
 
@@ -348,12 +347,12 @@ Status Legend:
   - [x] Controller methods in `src/controllers/budgets.controller.js`.
   - [x] Service calls to `sp_get_budget_plan_by_month` and `sp_upsert_budget_plan`.
   - [x] Validate `year`, `month`, `categoryId`, `plannedAmount`.
-- [ ] Frontend:
-  - [ ] Build year/month filter and editable budget table in `public/pages/budgets.html`.
-  - [ ] Add save flow with upsert behavior.
-  - [ ] Highlight updated row status and show success/failure message.
-- [ ] Test:
-  - [ ] Save plan, update same plan, and confirm duplicate prevention.
+- [x] Frontend:
+  - [x] Build year/month filter and editable budget table in `public/pages/budgets.html`.
+  - [x] Add save flow with upsert behavior.
+  - [x] Highlight updated row status and show success/failure message.
+- [x] Test:
+  - [x] Save plan, update same plan, and confirm duplicate prevention.
 
 ### US-04: Record daily transactions
 
@@ -362,23 +361,24 @@ Status Legend:
   - [x] Controller methods in `src/controllers/transactions.controller.js`.
   - [x] Service calls to `sp_add_transaction` and `sp_get_transactions`.
   - [x] Validate `txnDate`, `accountId`, `categoryId`, `amount`, `note`.
-- [ ] Frontend:
-  - [ ] Build transaction entry form and list on `public/pages/transactions.html`.
-  - [ ] Load account/category options from APIs.
-  - [ ] Implement month/category/account filters.
-- [ ] Test:
-  - [ ] Add income and expense records; verify filter behavior.
+- [x] Frontend:
+  - [x] Build transaction entry form and list on `public/pages/transactions.html`.
+  - [x] Load account/category options from APIs.
+  - [x] Implement month/category/account filters.
+- [x] Test:
+  - [x] Add income and expense records; verify filter behavior.
 
 ### US-05: Edit incorrect transactions
 
 - [x] Backend:
   - [x] Implement `PUT /api/transactions/:id` and `DELETE /api/transactions/:id`.
   - [x] Map not-found and conflict errors to proper status codes.
-- [ ] Frontend:
-  - [ ] Add edit mode and delete action for each transaction row.
-  - [ ] Preserve temporary edit state in `sessionStorage` if needed.
-- [ ] Test:
-  - [ ] Edit then refresh; delete then refresh; verify DB state.
+- [x] Frontend:
+  - [x] Add edit mode and delete action for each transaction row.
+  - [x] Preserve temporary edit state in `sessionStorage` if needed.
+  - [x] Duplicate transactions for next month when editing date to different month (optional advanced).
+- [x] Test:
+  - [x] Edit then refresh; delete then refresh; verify DB state.
 
 ### US-06: Compare planned vs actual by month
 
@@ -437,28 +437,6 @@ Status Legend:
   - [ ] Ensure all DB access remains through stored procedures/parameters.
 - [ ] Test:
   - [ ] Try malformed JSON, wrong types, and boundary values.
-
-### US-11: Classify savings and investment accounts
-
-- [ ] Requirements:
-  - [ ] Confirm final account type list, for example `CASH`, `TRANSACTION_ACCOUNT`, `SAVINGS`, `CREDIT_CARD`, `DIRECT_DEBIT`, `INVESTMENT`, and `LOAN`.
-  - [ ] Decide whether investment accounts are balance-only accounts or need future holdings/portfolio tracking.
-- [ ] Database:
-  - [ ] Update the `accounts.account_type` enum or lookup strategy.
-  - [ ] Add a migration path for existing account records.
-  - [ ] Update stored procedures that validate or write account type values.
-- [ ] Backend:
-  - [ ] Update account validation so the API accepts the new account types.
-  - [ ] Keep duplicate-name and soft-delete/reactivation behavior unchanged.
-  - [ ] Return clear validation messages for unsupported account types.
-- [ ] Frontend:
-  - [ ] Update Add Account and Edit Account forms with the new account type options.
-  - [ ] Display user-friendly labels for account types in the accounts grid.
-  - [ ] Confirm active/deleted account views still work with the new types.
-- [ ] Test:
-  - [ ] Create savings, transaction, investment, and loan accounts.
-  - [ ] Edit an existing account from an old type to a new type.
-  - [ ] Verify transactions can still be assigned to eligible active accounts.
 
 ### Story-by-Story Completion Gate (Apply To Every User Story)
 
