@@ -63,6 +63,16 @@ function createTypeBadge(categoryType) {
   return badge;
 }
 
+function createTaxClaimableBadge(value) {
+  const badge = document.createElement('span');
+  const isTaxClaimable = value === true || Number(value) === 1;
+
+  badge.className = isTaxClaimable ? 'badge bg-success' : 'badge bg-light text-secondary border';
+  badge.textContent = isTaxClaimable ? 'Yes' : 'No';
+
+  return badge;
+}
+
 async function fetchJson(url, options) {
   const response = await fetch(url, options);
   const result = await response.json();
@@ -115,6 +125,28 @@ function populateCategoryOptions() {
     appendOption(categorySelect, id, label);
     appendOption(filterCategorySelect, id, label);
   });
+
+  updateTaxClaimableState();
+}
+
+function getSelectedCategoryType() {
+  const selectedCategoryId = Number(document.getElementById('categoryId').value);
+  const selectedCategory = activeCategories.find(
+    (category) => Number(getCategoryId(category)) === selectedCategoryId
+  );
+
+  return selectedCategory ? getCategoryType(selectedCategory) : '';
+}
+
+function updateTaxClaimableState() {
+  const taxClaimableInput = document.getElementById('isTaxClaimable');
+  const isExpenseCategory = getSelectedCategoryType() === 'EXPENSE';
+
+  taxClaimableInput.disabled = !isExpenseCategory;
+
+  if (!isExpenseCategory) {
+    taxClaimableInput.checked = false;
+  }
 }
 
 async function loadLookups() {
@@ -170,6 +202,11 @@ function createTransactionRow(transaction) {
   const typeCell = document.createElement('td');
   typeCell.appendChild(createTypeBadge(transaction.category_type ?? transaction.categoryType));
 
+  const taxClaimableCell = document.createElement('td');
+  taxClaimableCell.appendChild(
+    createTaxClaimableBadge(transaction.is_tax_claimable ?? transaction.isTaxClaimable)
+  );
+
   const amountCell = document.createElement('td');
   amountCell.className = 'text-end fw-semibold';
   amountCell.textContent = formatCurrency(transaction.amount);
@@ -184,7 +221,16 @@ function createTransactionRow(transaction) {
   editButton.innerHTML = '<i class="bi bi-pencil me-1"></i>Edit';
   actionsCell.appendChild(editButton);
 
-  row.append(dateCell, accountCell, categoryCell, typeCell, amountCell, noteCell, actionsCell);
+  row.append(
+    dateCell,
+    accountCell,
+    categoryCell,
+    typeCell,
+    taxClaimableCell,
+    amountCell,
+    noteCell,
+    actionsCell
+  );
   return row;
 }
 
@@ -328,6 +374,7 @@ async function handleTransactionSubmit(event) {
     accountId: Number(document.getElementById('accountId').value),
     categoryId: Number(document.getElementById('categoryId').value),
     amount: Number(document.getElementById('amount').value),
+    isTaxClaimable: document.getElementById('isTaxClaimable').checked,
     note: document.getElementById('note').value.trim() || null,
   };
 
@@ -342,6 +389,7 @@ async function handleTransactionSubmit(event) {
     form.reset();
     form.classList.remove('was-validated');
     setDefaultDates();
+    updateTaxClaimableState();
     await loadTransactions();
   } catch (error) {
     console.error('Failed to save transaction', error);
@@ -353,6 +401,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   setDefaultDates();
 
   document.getElementById('transactionForm')?.addEventListener('submit', handleTransactionSubmit);
+  document.getElementById('categoryId')?.addEventListener('change', updateTaxClaimableState);
   document.getElementById('transactionFilterForm')?.addEventListener('submit', function (event) {
     event.preventDefault();
     loadTransactions();

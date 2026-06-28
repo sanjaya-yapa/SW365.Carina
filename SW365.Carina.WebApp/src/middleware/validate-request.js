@@ -214,6 +214,30 @@ function validateDate(fieldName, options = {}) {
   };
 }
 
+function validateOptionalBoolean(fieldName, options = {}) {
+  const source = options.source || 'body';
+  const defaultValue = options.defaultValue ?? false;
+
+  return (req) => {
+    const container = req[source] || {};
+    const value = container[fieldName];
+
+    if (value === undefined) {
+      container[fieldName] = defaultValue;
+      return null;
+    }
+
+    if (typeof value !== 'boolean') {
+      return {
+        field: fieldName,
+        message: `${fieldName} must be a boolean`,
+      };
+    }
+
+    return null;
+  };
+}
+
 module.exports = {
   validateRequest,
   validatePositiveIntParam,
@@ -223,4 +247,5 @@ module.exports = {
   validatePositiveDecimal,
   validateNonNegativeDecimal,
   validateDate,
+  validateOptionalBoolean,
 };

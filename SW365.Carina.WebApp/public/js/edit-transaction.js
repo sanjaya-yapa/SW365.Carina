@@ -8,6 +8,7 @@ const CATEGORIES_API_BASE = '/api/categories';
 
 let transactionId = null;
 let deleteConfirmModal = null;
+let activeCategories = [];
 
 function getTransactionIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -34,6 +35,26 @@ function getCategoryName(category) {
 
 function getCategoryType(category) {
   return category.category_type ?? category.categoryType ?? '';
+}
+
+function getSelectedCategoryType() {
+  const selectedCategoryId = Number(document.getElementById('categoryId').value);
+  const selectedCategory = activeCategories.find(
+    (category) => Number(getCategoryId(category)) === selectedCategoryId
+  );
+
+  return selectedCategory ? getCategoryType(selectedCategory) : '';
+}
+
+function updateTaxClaimableState() {
+  const taxClaimableInput = document.getElementById('isTaxClaimable');
+  const isExpenseCategory = getSelectedCategoryType() === 'EXPENSE';
+
+  taxClaimableInput.disabled = !isExpenseCategory;
+
+  if (!isExpenseCategory) {
+    taxClaimableInput.checked = false;
+  }
 }
 
 function formatDate(value) {
@@ -67,6 +88,7 @@ async function loadLookups() {
     fetchJson(`${ACCOUNTS_API_BASE}?status=active`),
     fetchJson(`${CATEGORIES_API_BASE}?status=active`),
   ]);
+  activeCategories = categories;
 
   const accountSelect = document.getElementById('accountId');
   const categorySelect = document.getElementById('categoryId');
@@ -106,6 +128,11 @@ async function loadTransaction() {
     document.getElementById('accountId').value = transaction.account_id ?? transaction.accountId;
     document.getElementById('categoryId').value = transaction.category_id ?? transaction.categoryId;
     document.getElementById('amount').value = Number(transaction.amount || 0).toFixed(2);
+    updateTaxClaimableState();
+    document.getElementById('isTaxClaimable').checked =
+      getSelectedCategoryType() === 'EXPENSE' &&
+      (transaction.is_tax_claimable === true ||
+        Number(transaction.is_tax_claimable ?? transaction.isTaxClaimable) === 1);
     document.getElementById('note').value = transaction.note || '';
   } catch (error) {
     console.error('Failed to load transaction', error);
@@ -119,6 +146,7 @@ function getFormPayload() {
     accountId: Number(document.getElementById('accountId').value),
     categoryId: Number(document.getElementById('categoryId').value),
     amount: Number(document.getElementById('amount').value),
+    isTaxClaimable: document.getElementById('isTaxClaimable').checked,
     note: document.getElementById('note').value.trim() || null,
   };
 }
@@ -216,6 +244,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   document
     .getElementById('editTransactionForm')
     ?.addEventListener('submit', handleUpdateTransaction);
+  document.getElementById('categoryId')?.addEventListener('change', updateTaxClaimableState);
   document
     .getElementById('duplicateTransactionBtn')
     ?.addEventListener('click', handleDuplicateTransaction);

@@ -60,16 +60,17 @@ async function getTransactionById(req, res) {
 /**
  * POST /api/transactions
  * Create a new transaction
- * Request body: { txnDate, accountId, categoryId, amount, note }
+ * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note }
  */
 async function createTransaction(req, res) {
   try {
-    const { txnDate, accountId, categoryId, amount, note } = req.body;
+    const { txnDate, accountId, categoryId, amount, isTaxClaimable, note } = req.body;
     console.log('🔍 DEBUG: Controller received body:', {
       txnDate,
       accountId,
       categoryId,
       amount,
+      isTaxClaimable,
       note,
     });
 
@@ -78,6 +79,7 @@ async function createTransaction(req, res) {
       accountId,
       categoryId,
       amount,
+      isTaxClaimable,
       note || null
     );
     console.log('✅ DEBUG: Controller received result from service:', result);
@@ -92,18 +94,19 @@ async function createTransaction(req, res) {
 /**
  * PUT /api/transactions/:id
  * Update an existing transaction
- * Request body: { txnDate, accountId, categoryId, amount, note }
+ * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note }
  */
 async function updateTransaction(req, res) {
   try {
     const { id } = req.params;
-    const { txnDate, accountId, categoryId, amount, note } = req.body;
+    const { txnDate, accountId, categoryId, amount, isTaxClaimable, note } = req.body;
     console.log('🔍 DEBUG: Controller received params/body:', {
       id,
       txnDate,
       accountId,
       categoryId,
       amount,
+      isTaxClaimable,
       note,
     });
 
@@ -113,6 +116,7 @@ async function updateTransaction(req, res) {
       accountId,
       categoryId,
       amount,
+      isTaxClaimable,
       note || null
     );
     console.log('✅ DEBUG: Controller received result from service:', result);

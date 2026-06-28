@@ -6,6 +6,7 @@ const {
   validatePositiveIntRange,
   validateDate,
   validatePositiveDecimal,
+  validateOptionalBoolean,
 } = require('../middleware/validate-request');
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const transactionBodyValidators = [
   validatePositiveIntRange('accountId', 1, Number.MAX_SAFE_INTEGER),
   validatePositiveIntRange('categoryId', 1, Number.MAX_SAFE_INTEGER),
   validatePositiveDecimal('amount'), // amount must be > 0
+  validateOptionalBoolean('isTaxClaimable', { defaultValue: false }), // optional boolean
   // note is optional, no validation needed
 ];
 

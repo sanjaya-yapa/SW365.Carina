@@ -127,6 +127,17 @@
                   <div class="invalid-feedback">Please enter an amount greater than zero.</div>
                 </div>
 
+                <div class="form-check form-switch mb-3">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="isTaxClaimable"
+                    disabled
+                  />
+                  <label class="form-check-label" for="isTaxClaimable"> Tax claimable </label>
+                </div>
+
                 <div class="mb-4">
                   <label for="note" class="form-label">Note</label>
                   <input type="text" class="form-control" id="note" maxlength="255" />
@@ -204,6 +215,7 @@
                   <th scope="col">Account</th>
                   <th scope="col">Category</th>
                   <th scope="col">Type</th>
+                  <th scope="col">Tax</th>
                   <th scope="col" class="text-end">Amount</th>
                   <th scope="col">Note</th>
                   <th scope="col">Actions</th>

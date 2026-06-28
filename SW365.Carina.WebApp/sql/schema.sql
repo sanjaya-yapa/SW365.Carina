@@ -91,6 +91,7 @@ CREATE TABLE transactions (
 	account_id BIGINT UNSIGNED NOT NULL,
 	category_id BIGINT UNSIGNED NOT NULL,
 	amount DECIMAL(12, 2) NOT NULL,
+	is_tax_claimable BOOLEAN NOT NULL DEFAULT FALSE,
 	note VARCHAR(255) NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -105,6 +106,8 @@ CREATE TABLE transactions (
 		FOREIGN KEY (account_id) REFERENCES accounts (account_id)
 		ON UPDATE CASCADE
 		ON DELETE RESTRICT,
+	CONSTRAINT chk_transactions_is_tax_claimable
+    	CHECK (is_tax_claimable IN (0, 1)),
 	CONSTRAINT fk_transactions_category
 		FOREIGN KEY (category_id) REFERENCES categories (category_id)
 		ON UPDATE CASCADE

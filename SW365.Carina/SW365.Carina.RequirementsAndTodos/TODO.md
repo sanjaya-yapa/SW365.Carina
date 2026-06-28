@@ -1,6 +1,7 @@
 # TODO - Personal Finance Budget Web App
 
 Status Legend:
+
 - [x] Completed
 - [~] In progress / partially completed
 - [ ] Not started
@@ -385,12 +386,12 @@ Status Legend:
 - [x] Backend:
   - [x] Add report route/controller/service for monthly summary.
   - [x] Call `sp_get_monthly_summary` and map response fields clearly.
-- [ ] Frontend:
-  - [ ] Add year/month selectors on `public/pages/dashboard.html`.
-  - [ ] Render cards: planned, actual, variance, income, expense, net.
-  - [ ] Render planned-vs-actual table by category.
-- [ ] Test:
-  - [ ] Validate summary values against sample workbook month.
+- [x] Frontend:
+  - [x] Add year/month selectors on `public/pages/dashboard.html`.
+  - [x] Render cards: planned, actual, variance, income, expense, net.
+  - [x] Render planned-vs-actual table by category.
+- [x] Test:
+  - [x] Validate summary values against sample workbook month.
 
 ### US-07: Review annual totals/trends
 
@@ -437,6 +438,25 @@ Status Legend:
   - [ ] Ensure all DB access remains through stored procedures/parameters.
 - [ ] Test:
   - [ ] Try malformed JSON, wrong types, and boundary values.
+
+### US-11: Identify tax-claimable expenses
+
+- [x] Database:
+  - [x] Add `transactions.is_tax_claimable` with a default value of `FALSE`.
+  - [x] Update transaction create, read, and update stored procedures.
+- [x] Backend:
+  - [x] Accept and validate `isTaxClaimable` on transaction write endpoints.
+  - [x] Reject tax-claimable income transactions.
+  - [x] Return `is_tax_claimable` from transaction read operations.
+- [x] Frontend:
+  - [x] Add the tax-claimable checkbox to create and edit forms.
+  - [x] Disable and clear the checkbox when an income category is selected.
+  - [x] Display tax-claimable status in the transaction list.
+  - [x] Preserve tax-claimable status when duplicating a transaction.
+- [ ] Test:
+  - [ ] Create, edit, list, and duplicate a tax-claimable expense.
+  - [x] Verify income and existing transactions default to non-claimable.
+  - [x] Verify the API rejects a tax-claimable income transaction.
 
 ### Story-by-Story Completion Gate (Apply To Every User Story)
 

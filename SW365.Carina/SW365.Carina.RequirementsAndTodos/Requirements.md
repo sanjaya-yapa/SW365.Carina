@@ -43,6 +43,8 @@ The MVP should support the core budgeting flow that is commonly represented in a
 ### FR-04 Transaction Entry
 
 - User can add income/expense transactions with date, account, category, amount, note.
+- User can mark an expense transaction as tax claimable.
+- Income transactions cannot be marked as tax claimable.
 - User can edit and delete transactions.
 - Amount must be positive and numeric.
 
@@ -99,6 +101,7 @@ The MVP should support the core budgeting flow that is commonly represented in a
 
 10. As a budget owner, I want protected delete behavior so historical data is not broken.
 11. As a budget owner, I want backend validation so invalid or unsafe data cannot be saved.
+12. As a budget owner, I want to identify tax-claimable expense transactions so I can prepare accurate tax records.
 
 ## 6) Acceptance Criteria (MVP)
 
@@ -110,6 +113,8 @@ The MVP should support the core budgeting flow that is commonly represented in a
 6. Stored procedures are used for create/update/get business operations.
 7. Linting and formatting checks pass.
 8. User can create and edit accounts using account types that include savings and investment accounts.
+9. User can create and edit an expense transaction with a tax-claimable flag.
+10. Income transactions and existing transactions are not tax claimable by default.
 
 ## 7) Assumptions
 
@@ -157,6 +162,7 @@ Use one row per workbook field.
 | Transactions | Category | VARCHAR | Input | transactions | category_id | /api/transactions | categoryId | transactions.html | Required, must exist in categories | |
 | Transactions | Amount | DECIMAL(12,2) | Input | transactions | amount | /api/transactions | amount | transactions.html | Required, positive number | |
 | Transactions | Note | VARCHAR | Input | transactions | note | /api/transactions | note | transactions.html | Optional, max length 255 | |
+| Transactions | Tax Claimable | BOOLEAN | Input | transactions | is_tax_claimable | /api/transactions | isTaxClaimable | transactions.html | Optional, defaults to false, allowed only for expense transactions | |
 | Dashboard | Total Planned | DECIMAL(12,2) | Calculated | derived | derived | /api/reports/monthly-summary | totalPlanned | dashboard.html | Read only | computed in procedure |
 | Dashboard | Total Actual | DECIMAL(12,2) | Calculated | derived | derived | /api/reports/monthly-summary | totalActual | dashboard.html | Read only | computed in procedure |
 | Dashboard | Variance | DECIMAL(12,2) | Calculated | derived | derived | /api/reports/monthly-summary | variance | dashboard.html | Read only | planned minus actual |
