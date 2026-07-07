@@ -1,0 +1,24 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - unzip
+  - nginx
+  - mysql-server
+  - certbot
+  - python3-certbot-nginx
+
+runcmd:
+  - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  - apt-get install -y nodejs
+  - curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+  - systemctl enable mysql
+  - systemctl enable nginx
+  - systemctl start mysql
+  - systemctl start nginx
+
