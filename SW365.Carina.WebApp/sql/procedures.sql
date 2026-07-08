@@ -38,7 +38,7 @@ BEGIN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Opening balance cannot be negative';
 	END IF;
 
-	IF p_account_type NOT IN ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
+	IF p_account_type NOT IN ('CASH', 'SAVINGS', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account type';
 	END IF;
 
@@ -82,7 +82,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Opening balance cannot be negative';
     END IF;
 
-    IF p_account_type NOT IN ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
+    IF p_account_type NOT IN ('CASH', 'SAVINGS', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account type';
     END IF;
 
@@ -580,4 +580,4 @@ END $$
 DELIMITER ;
 
 -- Note: If you already created the database with the old account_type enum, run:
--- ALTER TABLE accounts MODIFY account_type ENUM('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') NOT NULL DEFAULT 'CASH';
+-- ALTER TABLE accounts MODIFY account_type ENUM('CASH', 'SAVINGS', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT') NOT NULL DEFAULT 'CASH';

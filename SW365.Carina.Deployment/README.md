@@ -38,6 +38,9 @@ scripts/02-deploy-application.ps1
 scripts/03-deploy-database.ps1
 scripts/04-install-mysql-backup.ps1
 scripts/05-run-mysql-backup.ps1
+scripts/06-update-database-add-savings-account-type.ps1
+scripts/07-update-application.ps1
+sql-updates/2026-07-08-add-savings-account-type.sql
 vm/setup-app.sh                    Remote app installer
 vm/backup-mysql.sh                 Remote backup script
 ```
@@ -96,6 +99,31 @@ vm/backup-mysql.sh                 Remote backup script
 ```
 
 If you later decide you want a daily schedule, run step 4 with `-InstallDailySchedule`.
+
+## Updating an Existing Azure VM App
+
+For updates to an already deployed VM, do not run `03-deploy-database.ps1` unless you intend to rebuild the database from `schema.sql`. The schema script drops and recreates tables.
+
+For the account type update that adds `SAVINGS`, run the non-destructive database update first:
+
+```powershell
+.\scripts\06-update-database-add-savings-account-type.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina" `
+  -DbPassword "<APP_DB_PASSWORD>"
+```
+
+Then deploy the web app changes and restart the Node.js service:
+
+```powershell
+.\scripts\07-update-application.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+```
+
+The application update preserves the existing remote `.env`, copies the current web app files, runs `npm ci --omit=dev`, and restarts the `personal-finance` systemd service.
 
 ## Cost Control
 

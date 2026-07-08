@@ -9,11 +9,12 @@ const {
 } = require('../middleware/validate-request');
 
 const router = express.Router();
+const ACCOUNT_TYPES = ['CASH', 'SAVINGS', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT'];
 
 // New types for creation
 const accountBodyValidators = [
   validateRequiredString('name', { maxLength: 100 }),
-  validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
+  validateEnumString('accountType', ACCOUNT_TYPES),
   validateNonNegativeDecimal('openingBalance'),
 ];
 
@@ -28,7 +29,7 @@ router.post('/', validateRequest(accountBodyValidators), accountsController.crea
 // Update validators
 const accountUpdateValidators = [
   validateRequiredString('name', { maxLength: 100 }),
-  validateEnumString('accountType', ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'DIRECT_DEBIT']),
+  validateEnumString('accountType', ACCOUNT_TYPES),
   validateNonNegativeDecimal('openingBalance'),
 ];
 
