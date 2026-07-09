@@ -5,6 +5,7 @@ param(
     [string]$AdminUsername = "azureuser",
     [string]$SshPublicKeyPath = "$env:USERPROFILE\.ssh\id_rsa.pub",
     [string]$VmSize = "Standard_B1s",
+    [string]$OsDiskSku = "Standard_LRS",
     [string]$AddressPrefix = "10.42.0.0/16",
     [string]$SubnetPrefix = "10.42.1.0/24"
 )
@@ -142,6 +143,7 @@ az vm create `
     --admin-username $AdminUsername `
     --ssh-key-values $SshPublicKeyPath `
     --nics $nicName `
+    --storage-sku $OsDiskSku `
     --assign-identity `
     --custom-data $cloudInitPath `
     --output table
@@ -185,4 +187,3 @@ Write-Host "Storage:   $storageAccountName"
 Write-Host "SSH:       ssh -i <private-key-path> $AdminUsername@$publicIp"
 Write-Host ""
 Write-Host "Wait 2-5 minutes for cloud-init to finish before deploying the app."
-
