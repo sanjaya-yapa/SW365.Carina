@@ -40,9 +40,12 @@ scripts/04-install-mysql-backup.ps1
 scripts/05-run-mysql-backup.ps1
 scripts/06-update-database-add-savings-account-type.ps1
 scripts/07-update-application.ps1
+scripts/08-change-vm-os-disk-sku.ps1
+scripts/09-restore-mysql-backup.ps1
 sql-updates/2026-07-08-add-savings-account-type.sql
 vm/setup-app.sh                    Remote app installer
 vm/backup-mysql.sh                 Remote backup script
+vm/restore-mysql.sh                Remote restore script
 ```
 
 ## Deployment Flow
@@ -55,7 +58,8 @@ vm/backup-mysql.sh                 Remote backup script
   -Location "australiaeast" `
   -VmName "vm-carina-personal" `
   -AdminUsername "azureuser" `
-  -SshPublicKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina.pub"
+  -SshPublicKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina.pub" `
+  -OsDiskSku "Standard_LRS"
 ```
 
 2. Deploy the web app:
@@ -124,6 +128,92 @@ Then deploy the web app changes and restart the Node.js service:
 ```
 
 The application update preserves the existing remote `.env`, copies the current web app files, runs `npm ci --omit=dev`, and restarts the `personal-finance` systemd service.
+
+## Changing the VM OS Disk to Standard HDD
+
+Future VM deployments use `-OsDiskSku "Standard_LRS"` by default, which creates the OS disk as Standard HDD.
+
+Changing the disk SKU requires the VM to be deallocated, so plan for app downtime. For extra safety, create a disk snapshot before changing the SKU.
+
+Changing the disk SKU should preserve the data on the managed disk. The backup and restore steps below are a safety net in case you need to recover MySQL data.
+
+### Full Backup, Disk Change, Restore Runbook
+
+1. Make sure the backup script is installed. Run this once if it has not already been installed:
+
+```powershell
+.\scripts\04-install-mysql-backup.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina" `
+  -StorageAccountName "<STORAGE_ACCOUNT_NAME>" `
+  -DbPassword "<APP_DB_PASSWORD>"
+```
+
+2. Run a fresh manual MySQL backup before touching the disk:
+
+```powershell
+.\scripts\05-run-mysql-backup.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+```
+
+The backup script prints the uploaded blob name, for example `personal_finance_2026-07-09_10-15-00.sql.gz`. Keep that name if you want to restore a specific backup.
+
+3. Change the OS disk from Premium SSD to Standard HDD and start the VM again:
+
+```powershell
+.\scripts\08-change-vm-os-disk-sku.ps1 `
+  -ResourceGroupName "rg-carina-personal" `
+  -VmName "vm-carina-personal" `
+  -DiskSku "Standard_LRS" `
+  -StartVmAfterChange
+```
+
+4. Check the app. In the normal case, the data should still be there and you do not need to restore.
+
+5. If you need to restore MySQL from the latest backup, run:
+
+Restoring overwrites the database with the backup state. Only do this if the app data is missing or corrupted after the disk SKU change.
+
+```powershell
+.\scripts\09-restore-mysql-backup.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+```
+
+To restore a specific backup blob instead of the latest one:
+
+```powershell
+.\scripts\09-restore-mysql-backup.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina" `
+  -BackupBlobName "personal_finance_2026-07-09_10-15-00.sql.gz"
+```
+
+The restore script stops the `personal-finance` service, downloads the backup from Azure Blob Storage using the VM managed identity, imports it into MySQL, and starts the service again.
+
+For an existing VM that already has a Premium SSD OS disk, run:
+
+```powershell
+.\scripts\08-change-vm-os-disk-sku.ps1 `
+  -ResourceGroupName "rg-carina-personal" `
+  -VmName "vm-carina-personal" `
+  -DiskSku "Standard_LRS"
+```
+
+This deallocates the VM, changes the managed OS disk SKU, and leaves the VM stopped. Add `-StartVmAfterChange` if you want the script to start it again:
+
+```powershell
+.\scripts\08-change-vm-os-disk-sku.ps1 `
+  -ResourceGroupName "rg-carina-personal" `
+  -VmName "vm-carina-personal" `
+  -DiskSku "Standard_LRS" `
+  -StartVmAfterChange
+```
 
 ## Cost Control
 
