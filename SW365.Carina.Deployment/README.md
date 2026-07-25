@@ -42,7 +42,9 @@ scripts/06-update-database-add-savings-account-type.ps1
 scripts/07-update-application.ps1
 scripts/08-change-vm-os-disk-sku.ps1
 scripts/09-restore-mysql-backup.ps1
+scripts/10-update-database-add-bank-transaction-imports.ps1
 sql-updates/2026-07-08-add-savings-account-type.sql
+sql-updates/2026-07-19-add-bank-transaction-imports.sql
 vm/setup-app.sh                    Remote app installer
 vm/backup-mysql.sh                 Remote backup script
 vm/restore-mysql.sh                Remote restore script
@@ -128,6 +130,25 @@ Then deploy the web app changes and restart the Node.js service:
 ```
 
 The application update preserves the existing remote `.env`, copies the current web app files, runs `npm ci --omit=dev`, and restarts the `personal-finance` systemd service.
+
+For the bank CSV import feature, run the non-destructive database update first:
+
+```powershell
+.\scripts\10-update-database-add-bank-transaction-imports.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina" `
+  -DbPassword "<APP_DB_PASSWORD>"
+```
+
+Then deploy the web app changes:
+
+```powershell
+.\scripts\07-update-application.ps1 `
+  -VmPublicIp "<VM_PUBLIC_IP_OR_DNS>" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+```
 
 ## Changing the VM OS Disk to Standard HDD
 

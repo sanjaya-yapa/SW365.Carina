@@ -46,6 +46,8 @@ router.put(
 );
 
 // DELETE /api/transactions/:id
+router.delete('/', transactionsController.deleteTransactions);
+
 router.delete(
   '/:id',
   validateRequest(validatePositiveIntParam('id')),

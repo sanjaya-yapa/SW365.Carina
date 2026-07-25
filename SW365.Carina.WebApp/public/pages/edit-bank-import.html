@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Review Bank Import - Personal Finance</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"><i class="bi bi-wallet2 me-2"></i>Personal Finance</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/dashboard.html"
+                ><i class="bi bi-bar-chart me-1"></i>Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/accounts.html"
+                ><i class="bi bi-credit-card me-1"></i>Accounts</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/categories.html"
+                ><i class="bi bi-tags me-1"></i>Categories</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/budgets.html"
+                ><i class="bi bi-calculator me-1"></i>Budgets</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/pages/transactions.html">
+                <i class="bi bi-arrow-left-right me-1"></i>Transactions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/reports.html"
+                ><i class="bi bi-file-earmark-text me-1"></i>Reports</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4" style="max-width: 720px">
+      <div class="mb-4">
+        <a href="/pages/transactions.html" class="btn btn-outline-secondary">
+          <i class="bi bi-chevron-left me-1"></i>Back to Transactions
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="card-title mb-0">
+            <i class="bi bi-check2-square me-2"></i>Review Bank Import
+          </h4>
+        </div>
+        <div class="card-body">
+          <dl class="row mb-4">
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9" id="importDate"></dd>
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9 fw-semibold" id="importAmount"></dd>
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9" id="importDescription"></dd>
+          </dl>
+
+          <form id="reviewImportForm" novalidate>
+            <div class="mb-3">
+              <label for="accountId" class="form-label"
+                >Account <span class="text-danger">*</span></label
+              >
+              <select class="form-select" id="accountId" required>
+                <option value="">-- Select Account --</option>
+              </select>
+              <div class="invalid-feedback">Please select an account.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="categoryId" class="form-label"
+                >Category <span class="text-danger">*</span></label
+              >
+              <select class="form-select" id="categoryId" required>
+                <option value="">-- Select Category --</option>
+              </select>
+              <div class="invalid-feedback">Please select a category.</div>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="isTaxClaimable"
+                disabled
+              />
+              <label class="form-check-label" for="isTaxClaimable">Tax claimable</label>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+              <button type="button" class="btn btn-outline-danger" id="deleteImportBtn">
+                <i class="bi bi-trash me-1"></i>Delete Pending Import
+              </button>
+              <div class="d-grid gap-2 d-md-flex">
+                <a href="/pages/transactions.html" class="btn btn-secondary">
+                  <i class="bi bi-x-circle me-1"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-circle me-1"></i>Create Transaction
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/edit-bank-import.js"></script>
+  </body>
+</html>

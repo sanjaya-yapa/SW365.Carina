@@ -149,6 +149,31 @@
               </form>
             </div>
           </div>
+
+          <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+              <h4 class="card-title h5 mb-0"><i class="bi bi-upload me-2"></i>Import Bank CSV</h4>
+            </div>
+            <div class="card-body">
+              <form id="bankImportForm" novalidate>
+                <div class="mb-3">
+                  <label for="bankCsvFile" class="form-label">Bank CSV file</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="bankCsvFile"
+                    accept=".csv,.txt"
+                    required
+                  />
+                  <div class="invalid-feedback">Please select a CSV file.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="bi bi-upload me-1"></i>Import Selected Month
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
 
         <div class="col-lg-8">
@@ -204,13 +229,70 @@
 
           <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
             <div class="text-muted" id="transactionSummary">Loading transactions...</div>
-            <div class="fw-semibold" id="transactionTotals"></div>
+            <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                id="deleteSelectedTransactionsBtn"
+                disabled
+              >
+                <i class="bi bi-trash me-1"></i>Delete Selected
+              </button>
+              <div class="fw-semibold" id="transactionTotals"></div>
+            </div>
+          </div>
+
+          <div class="mb-4" id="pendingImportsSection">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
+              <h2 class="h5 mb-0">Pending Bank Imports</h2>
+              <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  id="deleteSelectedImportsBtn"
+                  disabled
+                >
+                  <i class="bi bi-trash me-1"></i>Delete Selected
+                </button>
+                <div class="text-muted" id="pendingImportsSummary">Loading imports...</div>
+              </div>
+            </div>
+            <div class="table-responsive border rounded">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col" style="width: 40px">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="pendingImportsSelectAll"
+                        aria-label="Select all pending imports"
+                      />
+                    </th>
+                    <th scope="col">Date</th>
+                    <th scope="col" class="text-end">Amount</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingImportsTableBody"></tbody>
+              </table>
+            </div>
+            <p class="text-muted text-center mt-3 mb-0 d-none" id="pendingImportsEmptyMessage"></p>
           </div>
 
           <div class="table-responsive border rounded">
             <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
+                  <th scope="col" style="width: 40px">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="transactionsSelectAll"
+                      aria-label="Select all visible transactions"
+                    />
+                  </th>
                   <th scope="col">Date</th>
                   <th scope="col">Account</th>
                   <th scope="col">Category</th>

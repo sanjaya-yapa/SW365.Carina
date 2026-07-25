@@ -10,6 +10,10 @@ function mapServiceError(err) {
     return { statusCode: 404, message: 'Transaction, account, or category not found' };
   }
 
+  if (lowered.includes('at least one') || lowered.includes('positive integers')) {
+    return { statusCode: 400, message: message };
+  }
+
   if (lowered.includes('invalid') || lowered.includes('reference')) {
     return { statusCode: 409, message: message };
   }
@@ -147,10 +151,21 @@ async function deleteTransaction(req, res) {
   }
 }
 
+async function deleteTransactions(req, res) {
+  try {
+    const result = await transactionsService.deleteTransactions(req.body.ids);
+    return sendSuccess(res, result, 'Transactions deleted successfully', 200);
+  } catch (err) {
+    const mapped = mapServiceError(err);
+    return sendError(res, mapped.message, null, mapped.statusCode);
+  }
+}
+
 module.exports = {
   getTransactions,
   getTransactionById,
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  deleteTransactions,
 };

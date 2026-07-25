@@ -36,6 +36,20 @@ function unwrapProcedureRows(resultRows) {
   return resultRows;
 }
 
+function normalizeIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    throw new Error('At least one transaction ID is required');
+  }
+
+  const normalizedIds = [...new Set(ids.map((id) => Number(id)))];
+
+  if (normalizedIds.some((id) => !Number.isInteger(id) || id <= 0)) {
+    throw new Error('Transaction IDs must be positive integers');
+  }
+
+  return normalizedIds;
+}
+
 /**
  * Get all transactions for a given month (optionally filtered by account/category)
  * @param {number} txnMonth - Transaction month (1-12)
@@ -270,10 +284,23 @@ async function deleteTransaction(id) {
   }
 }
 
+async function deleteTransactions(ids) {
+  const normalizedIds = normalizeIds(ids);
+  const execute = getExecute();
+  const placeholders = normalizedIds.map(() => '?').join(', ');
+  const [result] = await execute(
+    `DELETE FROM transactions WHERE transaction_id IN (${placeholders})`,
+    normalizedIds
+  );
+
+  return { affectedRows: result.affectedRows, requestedRows: normalizedIds.length };
+}
+
 module.exports = {
   getTransactions,
   getTransactionById,
   addTransaction,
   updateTransaction,
   deleteTransaction,
+  deleteTransactions,
 };
