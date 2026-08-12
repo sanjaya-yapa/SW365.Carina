@@ -11,7 +11,7 @@ const router = express.Router();
 
 const categoryBodyValidators = [
   validateRequiredString('name', { maxLength: 100 }),
-  validateEnumString('categoryType', ['INCOME', 'EXPENSE']),
+  validateEnumString('categoryType', ['INCOME', 'EXPENSE', 'ASSET']),
 ];
 
 router.get('/', categoriesController.getCategories);

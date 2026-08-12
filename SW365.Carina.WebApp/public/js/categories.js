@@ -52,7 +52,15 @@ async function reactivateCategory(categoryId) {
 function createCategoryCard(category) {
   const normalized = normalizeCategory(category);
   const isActive = normalized.isActive === 1 || normalized.isActive === true;
-  const isIncome = normalized.type === 'INCOME';
+  const typeBadges = {
+    INCOME: { className: 'badge bg-info text-dark', label: 'Income' },
+    EXPENSE: { className: 'badge bg-warning text-dark', label: 'Expense' },
+    ASSET: { className: 'badge bg-success', label: 'Asset' },
+  };
+  const typeBadgeDetails = typeBadges[normalized.type] || {
+    className: 'badge bg-secondary',
+    label: normalized.type,
+  };
 
   const column = document.createElement('div');
   column.className = 'col-md-4';
@@ -85,8 +93,8 @@ function createCategoryCard(category) {
   typeText.className = 'card-text';
 
   const typeBadge = document.createElement('span');
-  typeBadge.className = isIncome ? 'badge bg-info text-dark' : 'badge bg-warning text-dark';
-  typeBadge.textContent = isIncome ? 'Income' : 'Expense';
+  typeBadge.className = typeBadgeDetails.className;
+  typeBadge.textContent = typeBadgeDetails.label;
   typeText.appendChild(typeBadge);
 
   const idText = document.createElement('small');

@@ -55,9 +55,17 @@ function getCategoryValue(row, snakeCaseKey, camelCaseKey) {
 
 function createTypeBadge(categoryType) {
   const badge = document.createElement('span');
-  badge.className =
-    categoryType === 'INCOME' ? 'badge bg-info text-dark' : 'badge bg-warning text-dark';
-  badge.textContent = categoryType === 'INCOME' ? 'Income' : 'Expense';
+  const typeBadges = {
+    INCOME: { className: 'badge bg-info text-dark', label: 'Income' },
+    EXPENSE: { className: 'badge bg-warning text-dark', label: 'Expense' },
+    ASSET: { className: 'badge bg-success', label: 'Asset' },
+  };
+  const details = typeBadges[categoryType] || {
+    className: 'badge bg-secondary',
+    label: categoryType,
+  };
+  badge.className = details.className;
+  badge.textContent = details.label;
   return badge;
 }
 

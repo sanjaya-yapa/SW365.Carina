@@ -126,8 +126,8 @@ BEGIN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category name is required';
 	END IF;
 
-	IF p_category_type NOT IN ('INCOME', 'EXPENSE') THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category type must be INCOME or EXPENSE';
+	IF p_category_type NOT IN ('INCOME', 'EXPENSE', 'ASSET') THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category type must be INCOME, EXPENSE, or ASSET';
 	END IF;
 
 	INSERT INTO categories (category_name, category_type)
@@ -164,8 +164,8 @@ BEGIN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category name is required';
 	END IF;
 
-	IF p_category_type NOT IN ('INCOME', 'EXPENSE') THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category type must be INCOME or EXPENSE';
+	IF p_category_type NOT IN ('INCOME', 'EXPENSE', 'ASSET') THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Category type must be INCOME, EXPENSE, or ASSET';
 	END IF;
 
 	IF NOT EXISTS (SELECT 1 FROM categories WHERE category_id = p_category_id) THEN
