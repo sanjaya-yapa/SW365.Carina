@@ -74,6 +74,8 @@ function updateTaxClaimableState() {
   const isExpenseImport = getExpectedCategoryType() === 'EXPENSE';
 
   taxClaimableInput.disabled = !isExpenseImport;
+  document.getElementById('isRegular').disabled = !isExpenseImport;
+  if (!isExpenseImport) document.getElementById('isRegular').value = 'false';
 
   if (!isExpenseImport) {
     taxClaimableInput.checked = false;
@@ -152,6 +154,7 @@ async function handleCompleteImport(event) {
         accountId: Number(document.getElementById('accountId').value),
         categoryId: Number(document.getElementById('categoryId').value),
         isTaxClaimable: document.getElementById('isTaxClaimable').checked,
+        isRegular: document.getElementById('isRegular').value === 'true',
       }),
     });
 

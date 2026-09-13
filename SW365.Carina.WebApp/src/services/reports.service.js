@@ -49,10 +49,7 @@ async function getMonthSummary(year, month) {
     console.log('✅ DEBUG: Database executor obtained');
 
     console.log('🔍 DEBUG: Calling sp_get_monthly_summary with params:', [year, month]);
-    const [rows] = await execute(
-      'CALL sp_get_monthly_summary(?, ?)',
-      [year, month]
-    );
+    const [rows] = await execute('CALL sp_get_monthly_summary(?, ?)', [year, month]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -64,7 +61,7 @@ async function getMonthSummary(year, month) {
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
@@ -83,10 +80,7 @@ async function getMonthCategoryVariance(year, month) {
     console.log('✅ DEBUG: Database executor obtained');
 
     console.log('🔍 DEBUG: Calling sp_get_monthly_category_variance with params:', [year, month]);
-    const [rows] = await execute(
-      'CALL sp_get_monthly_category_variance(?, ?)',
-      [year, month]
-    );
+    const [rows] = await execute('CALL sp_get_monthly_category_variance(?, ?)', [year, month]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -98,7 +92,7 @@ async function getMonthCategoryVariance(year, month) {
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
@@ -116,10 +110,7 @@ async function getAnnualExpenseTrend(year) {
     console.log('✅ DEBUG: Database executor obtained');
 
     console.log('🔍 DEBUG: Calling sp_get_annual_expense_trend with params:', [year]);
-    const [rows] = await execute(
-      'CALL sp_get_annual_expense_trend(?)',
-      [year]
-    );
+    const [rows] = await execute('CALL sp_get_annual_expense_trend(?)', [year]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
     const data = unwrapProcedureRows(rows);
@@ -131,14 +122,76 @@ async function getAnnualExpenseTrend(year) {
       message: err.message,
       code: err.code,
       sqlState: err.sqlState,
-      stack: err.stack
+      stack: err.stack,
     });
     throw err;
   }
 }
 
+// Keep DECIMAL amounts exact while accumulating totals, including large reports.
+function toCents(amount) {
+  const [whole, fraction = ''] = String(amount).split('.');
+  return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'));
+}
+
+function fromCents(cents) {
+  return `${cents / 100n}.${String(cents % 100n).padStart(2, '0')}`;
+}
+
+async function getMonthlyExpenses(year, month, isRegular = null) {
+  const start = `${year}-${String(month).padStart(2, '0')}-01`;
+  const end =
+    month === 12 ? `${year + 1}-01-01` : `${year}-${String(month + 1).padStart(2, '0')}-01`;
+  const [rows] = await getExecute()(
+    `SELECT t.transaction_id, t.txn_date, t.note, t.amount, t.is_regular,
+            c.category_id, c.category_name, a.account_name
+       FROM transactions t
+       INNER JOIN categories c ON c.category_id = t.category_id
+       INNER JOIN accounts a ON a.account_id = t.account_id
+      WHERE c.category_type = 'EXPENSE' AND t.txn_date >= ? AND t.txn_date < ?
+      ${isRegular === null ? '' : 'AND t.is_regular = ?'}
+      ORDER BY c.category_name, c.category_id, t.txn_date, t.transaction_id`,
+    isRegular === null ? [start, end] : [start, end, isRegular]
+  );
+  const groups = new Map();
+  let grandTotal = 0n;
+  for (const row of rows) {
+    const key = String(row.category_id);
+    if (!groups.has(key)) {
+      groups.set(key, {
+        category_id: row.category_id,
+        category_name: row.category_name,
+        expenses: [],
+        cents: 0n,
+      });
+    }
+    const group = groups.get(key);
+    const cents = toCents(row.amount);
+    group.expenses.push({
+      transaction_id: row.transaction_id,
+      date: row.txn_date,
+      description: row.note || `Expense #${row.transaction_id}`,
+      account_name: row.account_name,
+      is_regular: Number(row.is_regular) === 1,
+      amount: fromCents(cents),
+    });
+    group.cents += cents;
+    grandTotal += cents;
+  }
+  return {
+    year,
+    month,
+    categories: Array.from(groups.values(), ({ cents, ...group }) => ({
+      ...group,
+      total: fromCents(cents),
+    })),
+    grand_total: fromCents(grandTotal),
+  };
+}
+
 module.exports = {
+  getMonthlyExpenses,
   getMonthSummary,
   getMonthCategoryVariance,
-  getAnnualExpenseTrend
+  getAnnualExpenseTrend,
 };

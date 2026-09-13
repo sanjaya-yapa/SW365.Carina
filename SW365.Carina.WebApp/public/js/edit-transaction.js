@@ -51,6 +51,8 @@ function updateTaxClaimableState() {
   const isExpenseCategory = getSelectedCategoryType() === 'EXPENSE';
 
   taxClaimableInput.disabled = !isExpenseCategory;
+  document.getElementById('isRegular').disabled = !isExpenseCategory;
+  if (!isExpenseCategory) document.getElementById('isRegular').value = 'false';
 
   if (!isExpenseCategory) {
     taxClaimableInput.checked = false;
@@ -133,6 +135,9 @@ async function loadTransaction() {
       getSelectedCategoryType() === 'EXPENSE' &&
       (transaction.is_tax_claimable === true ||
         Number(transaction.is_tax_claimable ?? transaction.isTaxClaimable) === 1);
+    document.getElementById('isRegular').value = String(
+      getSelectedCategoryType() === 'EXPENSE' && Number(transaction.is_regular) === 1
+    );
     document.getElementById('note').value = transaction.note || '';
   } catch (error) {
     console.error('Failed to load transaction', error);
@@ -147,6 +152,7 @@ function getFormPayload() {
     categoryId: Number(document.getElementById('categoryId').value),
     amount: Number(document.getElementById('amount').value),
     isTaxClaimable: document.getElementById('isTaxClaimable').checked,
+    isRegular: document.getElementById('isRegular').value === 'true',
     note: document.getElementById('note').value.trim() || null,
   };
 }

@@ -12,6 +12,7 @@ const router = express.Router();
 const completeImportValidators = [
   validatePositiveIntRange('accountId', 1, Number.MAX_SAFE_INTEGER),
   validatePositiveIntRange('categoryId', 1, Number.MAX_SAFE_INTEGER),
+  validateOptionalBoolean('isRegular', { defaultValue: false }),
   validateOptionalBoolean('isTaxClaimable', { defaultValue: false }),
 ];
 

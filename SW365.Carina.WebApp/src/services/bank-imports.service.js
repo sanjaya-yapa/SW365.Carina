@@ -195,7 +195,13 @@ async function getCategoryType(categoryId) {
   return category.category_type;
 }
 
-async function completeImport(id, accountId, categoryId, isTaxClaimable = false) {
+async function completeImport(
+  id,
+  accountId,
+  categoryId,
+  isTaxClaimable = false,
+  isRegular = false
+) {
   const importRow = await getImportById(id);
 
   if (importRow.status !== 'PENDING') {
@@ -219,14 +225,18 @@ async function completeImport(id, accountId, categoryId, isTaxClaimable = false)
   try {
     await connection.beginTransaction();
 
-    const [procedureRows] = await connection.execute('CALL sp_add_transaction(?, ?, ?, ?, ?, ?)', [
-      importRow.txn_date,
-      accountId,
-      categoryId,
-      Number(importRow.amount),
-      finalTaxClaimable,
-      importRow.description,
-    ]);
+    const [procedureRows] = await connection.execute(
+      'CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?)',
+      [
+        importRow.txn_date,
+        accountId,
+        categoryId,
+        Number(importRow.amount),
+        finalTaxClaimable,
+        importRow.description,
+        expectedCategoryType === 'EXPENSE' ? isRegular : false,
+      ]
+    );
 
     const transaction = unwrapProcedureRows(procedureRows)[0] || {};
     const transactionId = transaction.transactionId ?? transaction.transaction_id;

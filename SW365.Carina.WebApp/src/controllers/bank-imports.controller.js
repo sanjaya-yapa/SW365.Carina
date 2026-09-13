@@ -65,12 +65,13 @@ async function getImportById(req, res) {
 
 async function completeImport(req, res) {
   try {
-    const { accountId, categoryId, isTaxClaimable } = req.body;
+    const { accountId, categoryId, isTaxClaimable, isRegular } = req.body;
     const importRow = await bankImportsService.completeImport(
       req.params.id,
       accountId,
       categoryId,
-      isTaxClaimable
+      isTaxClaimable,
+      isRegular
     );
 
     return sendSuccess(res, importRow, 'Imported bank transaction completed successfully', 200);

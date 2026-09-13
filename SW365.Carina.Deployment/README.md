@@ -108,6 +108,36 @@ If you later decide you want a daily schedule, run step 4 with `-InstallDailySch
 
 ## Updating an Existing Azure VM App
 
+### Is Regular expense field
+
+Apply the additive migration first, then deploy the application. Existing expenses default to **No**.
+This migration retains the old write procedures for compatibility during rollout and can be rerun.
+Run these commands from the `SW365.Carina.Deployment` folder:
+
+```powershell
+.\scripts\11-update-database-add-regular-expenses.ps1 `
+  -VmPublicIp "20.213.93.151" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+
+# Continue only after the database update succeeds.
+.\scripts\07-update-application.ps1 `
+  -VmPublicIp "20.213.93.151" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina"
+```
+
+Use the existing VM's private key if its filename differs. The migration uses the VM's sudo access
+and MySQL root Unix socket authentication configured by `vm/setup-app.sh`; no database password is
+needed. It does not rebuild tables. Do not run `03-deploy-database.ps1` for this change.
+
+After deployment, hard-refresh the application. Add an expense with **Is Regular = Yes**, reopen it,
+change it to **No**, and confirm the transaction list and monthly report show the saved value.
+The field is also available when completing a bank expense import. It marks expenses only and does
+not schedule or generate recurring transactions.
+
+### Earlier updates
+
 For updates to an already deployed VM, do not run `03-deploy-database.ps1` unless you intend to rebuild the database from `schema.sql`. The schema script drops and recreates tables.
 
 For the account type update that adds `SAVINGS`, run the non-destructive database update first:

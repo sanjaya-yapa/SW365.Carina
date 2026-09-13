@@ -136,6 +136,16 @@
               />
               <label class="form-check-label" for="isTaxClaimable">Tax claimable</label>
             </div>
+            <div class="mb-3">
+              <label for="isRegular" class="form-label">Is Regular</label>
+              <select id="isRegular" class="form-select" disabled>
+                <option value="false" selected>No</option>
+                <option value="true">Yes</option>
+              </select>
+              <div class="form-text">
+                Indicates a regular expense; does not create recurring transactions.
+              </div>
+            </div>
 
             <div class="mb-4">
               <label for="note" class="form-label">Note</label>

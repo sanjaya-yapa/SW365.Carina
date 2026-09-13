@@ -269,6 +269,8 @@ function updateTaxClaimableState() {
   const isExpenseCategory = getSelectedCategoryType() === 'EXPENSE';
 
   taxClaimableInput.disabled = !isExpenseCategory;
+  document.getElementById('isRegular').disabled = !isExpenseCategory;
+  if (!isExpenseCategory) document.getElementById('isRegular').value = 'false';
 
   if (!isExpenseCategory) {
     taxClaimableInput.checked = false;
@@ -400,6 +402,8 @@ function createTransactionRow(transaction) {
   const typeCell = document.createElement('td');
   typeCell.appendChild(createTypeBadge(transaction.category_type ?? transaction.categoryType));
 
+  const regularCell = document.createElement('td');
+  regularCell.appendChild(createTaxClaimableBadge(transaction.is_regular));
   const taxClaimableCell = document.createElement('td');
   taxClaimableCell.appendChild(
     createTaxClaimableBadge(transaction.is_tax_claimable ?? transaction.isTaxClaimable)
@@ -426,6 +430,7 @@ function createTransactionRow(transaction) {
     categoryCell,
     typeCell,
     taxClaimableCell,
+    regularCell,
     amountCell,
     noteCell,
     actionsCell
@@ -800,6 +805,7 @@ async function handleTransactionSubmit(event) {
     categoryId: Number(document.getElementById('categoryId').value),
     amount: Number(document.getElementById('amount').value),
     isTaxClaimable: document.getElementById('isTaxClaimable').checked,
+    isRegular: document.getElementById('isRegular').value === 'true',
     note: document.getElementById('note').value.trim() || null,
   };
 

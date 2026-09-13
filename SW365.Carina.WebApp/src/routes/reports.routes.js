@@ -7,10 +7,24 @@ const router = express.Router();
 // Validators for query parameters
 const monthlyReportValidators = [
   validatePositiveIntRange('year', 2000, 2100, { source: 'query' }),
-  validatePositiveIntRange('month', 1, 12, { source: 'query' })
+  validatePositiveIntRange('month', 1, 12, { source: 'query' }),
 ];
 
 const annualTrendValidators = [validatePositiveIntRange('year', 2000, 2100, { source: 'query' })];
+
+function validateRegularFilter(req) {
+  const value = req.query.isRegular;
+  if (value !== undefined && value !== 'true' && value !== 'false') {
+    return { field: 'isRegular', message: 'isRegular must be true or false' };
+  }
+  return null;
+}
+
+router.get(
+  '/monthly-expenses',
+  validateRequest([...monthlyReportValidators, validateRegularFilter]),
+  reportsController.getMonthlyExpenses
+);
 
 // GET /api/reports/monthly-summary?year=2025&month=6
 router.get('/', validateRequest(monthlyReportValidators), reportsController.getMonthSummary);
@@ -23,6 +37,10 @@ router.get(
 );
 
 // GET /api/reports/annual-trend?year=2025
-router.get('/annual-trend', validateRequest(annualTrendValidators), reportsController.getAnnualExpenseTrend);
+router.get(
+  '/annual-trend',
+  validateRequest(annualTrendValidators),
+  reportsController.getAnnualExpenseTrend
+);
 
 module.exports = router;

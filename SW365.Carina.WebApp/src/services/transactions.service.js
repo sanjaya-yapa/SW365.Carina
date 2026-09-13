@@ -111,6 +111,7 @@ async function getTransactionById(id) {
       c.category_type,
       t.amount,
       t.is_tax_claimable,
+      t.is_regular,
       t.note,
       t.created_at,
       t.updated_at
@@ -140,7 +141,15 @@ async function getTransactionById(id) {
  * @param {string} [note] - Optional transaction note
  * @returns {Promise<Object>} The created transaction record
  */
-async function addTransaction(txnDate, accountId, categoryId, amount, isTaxClaimable, note = null) {
+async function addTransaction(
+  txnDate,
+  accountId,
+  categoryId,
+  amount,
+  isTaxClaimable,
+  note = null,
+  isRegular = false
+) {
   try {
     console.log('🔍 DEBUG: addTransaction called with:', {
       txnDate,
@@ -161,13 +170,14 @@ async function addTransaction(txnDate, accountId, categoryId, amount, isTaxClaim
       isTaxClaimable,
       note,
     ]);
-    const [rows] = await execute('CALL sp_add_transaction(?, ?, ?, ?, ?, ?)', [
+    const [rows] = await execute('CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?)', [
       txnDate,
       accountId,
       categoryId,
       amount,
       isTaxClaimable ?? false,
       note,
+      isRegular,
     ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
@@ -204,7 +214,8 @@ async function updateTransaction(
   categoryId,
   amount,
   isTaxClaimable,
-  note = null
+  note = null,
+  isRegular = false
 ) {
   try {
     console.log('🔍 DEBUG: updateTransaction called with:', {
@@ -228,7 +239,7 @@ async function updateTransaction(
       isTaxClaimable,
       note,
     ]);
-    const [rows] = await execute('CALL sp_update_transaction(?, ?, ?, ?, ?, ?, ?)', [
+    const [rows] = await execute('CALL sp_update_transaction_regular(?, ?, ?, ?, ?, ?, ?, ?)', [
       id,
       txnDate,
       accountId,
@@ -236,6 +247,7 @@ async function updateTransaction(
       amount,
       isTaxClaimable ?? false,
       note,
+      isRegular,
     ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 

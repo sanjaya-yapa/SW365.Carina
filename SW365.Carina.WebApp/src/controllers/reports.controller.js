@@ -26,10 +26,7 @@ async function getMonthSummary(req, res) {
     const { year, month } = req.query;
     console.log('🔍 DEBUG: Controller received query:', { year, month });
 
-    const result = await reportsService.getMonthSummary(
-      parseInt(year),
-      parseInt(month)
-    );
+    const result = await reportsService.getMonthSummary(parseInt(year), parseInt(month));
     console.log('✅ DEBUG: Controller received result from service:', result);
 
     return sendSuccess(res, result, 'Monthly summary retrieved successfully', 200);
@@ -48,10 +45,7 @@ async function getMonthCategoryVariance(req, res) {
     const { year, month } = req.query;
     console.log('🔍 DEBUG: Controller received query:', { year, month });
 
-    const result = await reportsService.getMonthCategoryVariance(
-      parseInt(year),
-      parseInt(month)
-    );
+    const result = await reportsService.getMonthCategoryVariance(parseInt(year), parseInt(month));
     console.log('✅ DEBUG: Controller received result from service:', result);
 
     return sendSuccess(res, result, 'Monthly category variance retrieved successfully', 200);
@@ -80,8 +74,23 @@ async function getAnnualExpenseTrend(req, res) {
   }
 }
 
+async function getMonthlyExpenses(req, res) {
+  try {
+    const result = await reportsService.getMonthlyExpenses(
+      Number(req.query.year),
+      Number(req.query.month),
+      req.query.isRegular === undefined ? null : req.query.isRegular === 'true'
+    );
+    return sendSuccess(res, result, 'Monthly expense report retrieved successfully', 200);
+  } catch (err) {
+    const mapped = mapServiceError(err);
+    return sendError(res, mapped.message, null, mapped.statusCode);
+  }
+}
+
 module.exports = {
+  getMonthlyExpenses,
   getMonthSummary,
   getMonthCategoryVariance,
-  getAnnualExpenseTrend
+  getAnnualExpenseTrend,
 };

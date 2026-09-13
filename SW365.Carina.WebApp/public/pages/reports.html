@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,9 +18,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          <i class="bi bi-wallet2 me-2"></i>Personal Finance
-        </a>
+        <a class="navbar-brand" href="/"> <i class="bi bi-wallet2 me-2"></i>Personal Finance </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -35,9 +33,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="bi bi-house-door me-1"></i>Home
-              </a>
+              <a class="nav-link" href="/"> <i class="bi bi-house-door me-1"></i>Home </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/pages/dashboard.html">
@@ -75,12 +71,66 @@
     </nav>
 
     <div class="container py-4">
-      <h1 class="h3">Reports</h1>
-      <p class="text-muted">Page scaffold ready.</p>
+      <h1 class="h3">Monthly expense report</h1>
+      <p class="text-muted">
+        Expenses grouped by category, with category totals and a grand total.
+      </p>
+      <form id="reportFilters" class="row g-3 align-items-end mb-4">
+        <div class="col-sm-5 col-md-3">
+          <label for="reportMonth" class="form-label">Month</label>
+          <input
+            id="reportMonth"
+            type="month"
+            class="form-control"
+            min="2000-01"
+            max="2100-12"
+            required
+          />
+        </div>
+        <div class="col-sm-5 col-md-3">
+          <label for="reportRegular" class="form-label">Is Regular</label>
+          <select id="reportRegular" class="form-select">
+            <option value="" selected>All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button id="generateReport" class="btn btn-primary" type="submit">Generate report</button>
+        </div>
+      </form>
+      <p id="reportStatus" role="status" aria-live="polite"></p>
+      <section id="expenseReport" class="card" aria-labelledby="reportTitle" hidden>
+        <div class="card-header"><h2 id="reportTitle" class="h5 mb-0"></h2></div>
+        <div class="table-responsive">
+          <table class="table mb-0 expense-report-table">
+            <caption class="visually-hidden">
+              Monthly expenses by category, including subtotals and grand total
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Category / Expense</th>
+                <th scope="col">Date</th>
+                <th scope="col">Account</th>
+                <th scope="col">Is Regular</th>
+                <th scope="col" class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="reportRows"></tbody>
+            <tfoot>
+              <tr class="table-dark">
+                <th scope="row" colspan="4">Grand Total</th>
+                <td id="grandTotal" class="text-end fw-bold"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/reports.js"></script>
   </body>
 </html>

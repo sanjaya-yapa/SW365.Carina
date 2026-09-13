@@ -1,3 +1,8 @@
 body {
   background-color: #f8f9fa;
 }
+
+.expense-report-table .report-description {
+  min-width: 14rem;
+  overflow-wrap: anywhere;
+}
