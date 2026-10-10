@@ -21,6 +21,12 @@ function validateRegularFilter(req) {
 }
 
 router.get(
+  '/monthly-analysis',
+  validateRequest([...annualTrendValidators, validateRegularFilter]),
+  reportsController.getMonthlyAnalysis
+);
+
+router.get(
   '/monthly-expenses',
   validateRequest([...monthlyReportValidators, validateRegularFilter]),
   reportsController.getMonthlyExpenses

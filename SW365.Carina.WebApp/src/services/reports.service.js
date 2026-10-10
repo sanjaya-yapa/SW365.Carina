@@ -190,8 +190,50 @@ async function getMonthlyExpenses(year, month, isRegular = null) {
 }
 
 module.exports = {
+  getMonthlyAnalysis,
   getMonthlyExpenses,
   getMonthSummary,
   getMonthCategoryVariance,
   getAnnualExpenseTrend,
 };
+
+async function getMonthlyAnalysis(year, isRegular = null) {
+  const params = [`${year}-01-01`, `${year + 1}-01-01`];
+  if (isRegular !== null) params.push(isRegular);
+  const [rows] = await getExecute()(
+    `SELECT c.category_id, c.category_name, MONTH(t.txn_date) AS expense_month,
+            SUM(t.amount) AS total
+       FROM transactions t
+       INNER JOIN categories c ON c.category_id = t.category_id
+      WHERE c.category_type = 'EXPENSE' AND t.txn_date >= ? AND t.txn_date < ?
+      ${isRegular === null ? '' : 'AND t.is_regular = ?'}
+      GROUP BY c.category_id, c.category_name, MONTH(t.txn_date)
+      ORDER BY c.category_name, c.category_id, expense_month`,
+    params
+  );
+  const groups = new Map();
+  const totals = Array(12).fill(0n);
+  for (const row of rows) {
+    const key = String(row.category_id);
+    if (!groups.has(key))
+      groups.set(key, {
+        category_id: row.category_id,
+        category_name: row.category_name,
+        months: Array(12).fill(0n),
+      });
+    const index = Number(row.expense_month) - 1;
+    const cents = toCents(row.total);
+    groups.get(key).months[index] += cents;
+    totals[index] += cents;
+  }
+  return {
+    year,
+    categories: [...groups.values()].map((group) => ({
+      ...group,
+      months: group.months.map(fromCents),
+      total: fromCents(group.months.reduce((sum, amount) => sum + amount, 0n)),
+    })),
+    monthly_totals: totals.map(fromCents),
+    grand_total: fromCents(totals.reduce((sum, amount) => sum + amount, 0n)),
+  };
+}

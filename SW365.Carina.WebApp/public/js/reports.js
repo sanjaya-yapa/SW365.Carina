@@ -57,6 +57,7 @@ async function loadExpenseReport(event) {
   const status = document.getElementById('reportStatus');
   const button = document.getElementById('generateReport');
   document.getElementById('expenseReport').hidden = true;
+  document.getElementById('dailyReport').hidden = true;
   status.className = 'text-muted';
   status.textContent = 'Loading expenses…';
   button.disabled = true;
@@ -69,6 +70,7 @@ async function loadExpenseReport(event) {
       throw new Error('Unable to load the expense report. Please try again.');
     if (request !== reportRequest) return;
     renderExpenseReport(payload.data);
+    renderDailySpending(payload.data);
     status.textContent = payload.data.categories.length
       ? ''
       : 'No expenses match the selected filters.';

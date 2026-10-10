@@ -98,7 +98,7 @@ test('HTTP endpoint validates inputs, returns a report and handles database erro
     const failure = await fetch(`${base}/api/reports/monthly-expenses?year=2026&month=9`);
     assert.equal(failure.status, 500);
     assert.doesNotMatch(await failure.text(), /private database details/);
-    const page = await fetch(`${base}/pages/reports.html`);
+    const page = await fetch(`${base}/pages/daily-expenses.html`);
     assert.equal(page.status, 200);
     assert.match(await page.text(), /\/js\/reports.js/);
   } finally {

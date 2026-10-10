@@ -33,7 +33,7 @@ npm run dev
 
 ## Monthly expense report
 
-Open **Reports**, select a month, and choose **Generate report**. The current month loads automatically.
+Open **Reports → Daily Spending & Expense Details**, select a month, and choose **Generate report**. The current month loads automatically.
 Use **Is Regular** to select **All**, **Yes**, or **No**. Changing the filter refreshes the report;
 category totals and the grand total include only matching expenses. Categories with no matches are
 omitted. The API accepts optional `isRegular=true` or `isRegular=false`; omit it for all expenses.
@@ -50,6 +50,22 @@ not generate recurring transactions. Existing installations must run the regular
 before deploying this version; see `../SW365.Carina.Deployment/README.md`.
 
 Run report checks with `node --test test/monthly-expenses.test.js` (database calls are stubbed).
+
+## Reports landing page and monthly analysis
+
+**Reports** opens a landing page with links to **Monthly Expense Analysis** and
+**Daily Spending & Expense Details**. Each report includes an **All reports** link.
+
+Monthly Expense Analysis compares all 12 months of the selected year using a
+stacked category chart and a table with monthly totals and changes from the preceding
+month. The Is Regular filter applies to the entire report. January has no comparison;
+percentage changes are unavailable when the previous month has zero expenses.
+Empty and future months show zero recorded spending, not forecasts. The table
+includes all matching categories even when categories are hidden in the chart.
+
+API: `GET /api/reports/monthly-analysis?year=2026`, optionally with
+`isRegular=true` or `isRegular=false`. No database migration is needed.
+See `../SW365.Carina.Deployment/REPORTS-LANDING-UPDATE.md` for deployment steps.
 
 ## Development commands
 

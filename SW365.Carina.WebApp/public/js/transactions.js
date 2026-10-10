@@ -15,6 +15,33 @@ let selectedTransactionIds = new Set();
 let selectedPendingImportIds = new Set();
 let currentPage = 1;
 let pageSize = 10;
+const importDrafts = new Map();
+let completingImports = false;
+
+function getImportDraft(importId) {
+  const id = Number(importId);
+  if (!importDrafts.has(id)) {
+    importDrafts.set(id, {
+      accountId: '',
+      categoryId: '',
+      isTaxClaimable: false,
+      isRegular: false,
+      dirty: false,
+      error: '',
+    });
+  }
+  return importDrafts.get(id);
+}
+
+function hasUnsavedImports() {
+  return completingImports || [...importDrafts.values()].some((draft) => draft.dirty);
+}
+
+window.addEventListener('beforeunload', (event) => {
+  if (!hasUnsavedImports()) return;
+  event.preventDefault();
+  event.returnValue = '';
+});
 
 function getAccountId(account) {
   return account.account_id ?? account.id;
@@ -326,10 +353,17 @@ function updateBulkDeleteButtons() {
   }
 
   if (deleteImportsButton) {
-    deleteImportsButton.disabled = selectedPendingImportIds.size === 0;
+    deleteImportsButton.disabled = completingImports || selectedPendingImportIds.size === 0;
     deleteImportsButton.innerHTML = `<i class="bi bi-trash me-1"></i>Delete Selected${
       selectedPendingImportIds.size > 0 ? ` (${selectedPendingImportIds.size})` : ''
     }`;
+  }
+  const completeButton = document.getElementById('completeSelectedImportsBtn');
+  if (completeButton) {
+    completeButton.disabled = completingImports || selectedPendingImportIds.size === 0;
+    completeButton.textContent = completingImports
+      ? 'Completing...'
+      : `Complete Selected (${selectedPendingImportIds.size})`;
   }
 }
 
@@ -570,12 +604,15 @@ function createPendingImportRow(importRow) {
   const row = document.createElement('tr');
   const importId = importRow.import_id ?? importRow.importId;
   const signedAmount = Number(importRow.signed_amount ?? importRow.signedAmount ?? 0);
+  const draft = getImportDraft(importId);
+  const isExpense = signedAmount < 0;
 
   const selectCell = document.createElement('td');
   const selectInput = document.createElement('input');
   selectInput.type = 'checkbox';
   selectInput.className = 'form-check-input';
   selectInput.checked = selectedPendingImportIds.has(Number(importId));
+  selectInput.disabled = completingImports;
   selectInput.setAttribute('aria-label', `Select pending import ${importId}`);
   selectInput.addEventListener('change', (event) => {
     if (event.target.checked) {
@@ -599,15 +636,156 @@ function createPendingImportRow(importRow) {
   const descriptionCell = document.createElement('td');
   descriptionCell.textContent = importRow.description || '';
 
+  function selectCellFor(field, label, choices) {
+    const cell = document.createElement('td');
+    const select = document.createElement('select');
+    select.className = 'form-select form-select-sm import-select';
+    select.setAttribute('aria-label', `${label} for import ${importId}`);
+    select.disabled = completingImports;
+    choices.forEach(([value, text]) => appendOption(select, value, text));
+    select.value = String(draft[field]);
+    select.addEventListener('change', () => {
+      draft[field] = field === 'isRegular' ? select.value === 'true' : select.value;
+      draft.dirty = true;
+      draft.error = '';
+    });
+    cell.appendChild(select);
+    return cell;
+  }
+  const accountCell = selectCellFor('accountId', 'Account', [
+    ['', 'Select account'],
+    ...activeAccounts.map((account) => [getAccountId(account), getAccountName(account)]),
+  ]);
+  const categoryCell = selectCellFor('categoryId', 'Category', [
+    ['', 'Select category'],
+    ...activeCategories
+      .filter((category) => getCategoryType(category) === (isExpense ? 'EXPENSE' : 'INCOME'))
+      .map((category) => [getCategoryId(category), getCategoryName(category)]),
+  ]);
+  if (!isExpense) {
+    draft.isTaxClaimable = false;
+    draft.isRegular = false;
+  }
+  const taxCell = document.createElement('td');
+  const taxInput = document.createElement('input');
+  taxInput.type = 'checkbox';
+  taxInput.className = 'form-check-input';
+  taxInput.checked = draft.isTaxClaimable;
+  taxInput.disabled = completingImports || !isExpense;
+  taxInput.setAttribute('aria-label', `Tax claimable for import ${importId}`);
+  taxInput.addEventListener('change', () => {
+    draft.isTaxClaimable = taxInput.checked;
+    draft.dirty = true;
+  });
+  taxCell.appendChild(taxInput);
+  const regularCell = selectCellFor('isRegular', 'Is Regular', [
+    ['false', 'No'],
+    ['true', 'Yes'],
+  ]);
+  regularCell.firstChild.disabled = completingImports || !isExpense;
+
   const actionsCell = document.createElement('td');
+  const completeButton = document.createElement('button');
+  completeButton.type = 'button';
+  completeButton.className = 'btn btn-sm btn-success me-1 mb-1';
+  completeButton.textContent = 'Complete';
+  completeButton.disabled = completingImports;
+  completeButton.addEventListener('click', () => completePendingImports([Number(importId)]));
+  actionsCell.appendChild(completeButton);
   const reviewButton = document.createElement('a');
   reviewButton.className = 'btn btn-sm btn-primary';
   reviewButton.href = `/pages/edit-bank-import.html?id=${encodeURIComponent(importId)}`;
   reviewButton.innerHTML = '<i class="bi bi-check2-square me-1"></i>Review';
+  reviewButton.addEventListener('click', (event) => {
+    if (completingImports) event.preventDefault();
+  });
   actionsCell.appendChild(reviewButton);
+  const errorMessage = document.createElement('div');
+  errorMessage.className = 'text-danger small mt-1';
+  errorMessage.setAttribute('role', 'alert');
+  errorMessage.textContent = draft.error;
+  actionsCell.appendChild(errorMessage);
 
-  row.append(selectCell, dateCell, amountCell, descriptionCell, actionsCell);
+  row.append(
+    selectCell,
+    dateCell,
+    amountCell,
+    descriptionCell,
+    accountCell,
+    categoryCell,
+    taxCell,
+    regularCell,
+    actionsCell
+  );
   return row;
+}
+
+async function completePendingImports(ids) {
+  if (completingImports || ids.length === 0) return;
+  completingImports = true;
+  setImportControlsBusy(true);
+  renderPendingImports();
+  let completed = 0;
+  let failed = 0;
+  try {
+    for (const id of [...new Set(ids.map(Number))]) {
+      const row = pendingImports.find((item) => Number(item.import_id ?? item.importId) === id);
+      if (!row) continue;
+      const draft = getImportDraft(id);
+      const isExpense = Number(row.signed_amount ?? row.signedAmount) < 0;
+      const validAccount = activeAccounts.some(
+        (account) => Number(getAccountId(account)) === Number(draft.accountId)
+      );
+      const validCategory = activeCategories.some(
+        (category) =>
+          Number(getCategoryId(category)) === Number(draft.categoryId) &&
+          getCategoryType(category) === (isExpense ? 'EXPENSE' : 'INCOME')
+      );
+      try {
+        if (!validAccount || !validCategory)
+          throw new Error('Select an account and a matching category.');
+        await fetchJson(`${BANK_IMPORTS_API_BASE}/${id}/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accountId: Number(draft.accountId),
+            categoryId: Number(draft.categoryId),
+            isTaxClaimable: isExpense && draft.isTaxClaimable,
+            isRegular: isExpense && draft.isRegular,
+          }),
+        });
+        pendingImports = pendingImports.filter(
+          (item) => Number(item.import_id ?? item.importId) !== id
+        );
+        importDrafts.delete(id);
+        selectedPendingImportIds.delete(id);
+        completed += 1;
+      } catch (error) {
+        draft.error = error.message;
+        failed += 1;
+      }
+      renderPendingImports();
+    }
+    if (completed > 0) await loadTransactions();
+    window.showMessage(
+      `${completed} completed${failed ? `; ${failed} could not be completed. Check the row messages.` : '.'}`,
+      failed ? 'warning' : 'success'
+    );
+  } finally {
+    completingImports = false;
+    setImportControlsBusy(false);
+    renderPendingImports();
+  }
+}
+
+function setImportControlsBusy(busy) {
+  document
+    .querySelectorAll(
+      '#transactionFilterForm input, #transactionFilterForm select, #transactionFilterForm button, #bankImportForm input, #bankImportForm button, #pendingImportsSelectAll'
+    )
+    .forEach((control) => {
+      control.disabled = busy;
+    });
 }
 
 function renderPendingImports() {
@@ -632,6 +810,7 @@ function renderPendingImports() {
 }
 
 async function loadPendingImports() {
+  if (completingImports) return;
   try {
     const { year, month } = getFilterValues();
     const params = new URLSearchParams({
@@ -662,6 +841,7 @@ async function readFileText(file) {
 
 async function handleBankImportSubmit(event) {
   event.preventDefault();
+  if (completingImports) return;
 
   const form = document.getElementById('bankImportForm');
   const file = document.getElementById('bankCsvFile').files[0];
@@ -729,6 +909,7 @@ async function handleDeleteSelectedTransactions() {
 }
 
 async function handleDeleteSelectedImports() {
+  if (completingImports) return;
   const ids = Array.from(selectedPendingImportIds);
 
   if (ids.length === 0) {
@@ -751,6 +932,7 @@ async function handleDeleteSelectedImports() {
     });
 
     window.showMessage(`${result.affectedRows} pending import(s) deleted.`, 'success');
+    ids.forEach((id) => importDrafts.delete(Number(id)));
     selectedPendingImportIds = new Set();
     await loadPendingImports();
   } catch (error) {
@@ -836,10 +1018,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   document.getElementById('categoryId')?.addEventListener('change', updateTaxClaimableState);
   document.getElementById('transactionFilterForm')?.addEventListener('submit', function (event) {
     event.preventDefault();
+    if (completingImports) return;
     loadTransactions();
     loadPendingImports();
   });
   document.getElementById('bankImportForm')?.addEventListener('submit', handleBankImportSubmit);
+  document
+    .getElementById('completeSelectedImportsBtn')
+    ?.addEventListener('click', () => completePendingImports([...selectedPendingImportIds]));
   document
     .getElementById('deleteSelectedTransactionsBtn')
     ?.addEventListener('click', handleDeleteSelectedTransactions);

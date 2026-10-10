@@ -258,6 +258,14 @@
               <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
                 <button
                   type="button"
+                  class="btn btn-success btn-sm"
+                  id="completeSelectedImportsBtn"
+                  disabled
+                >
+                  Complete Selected (0)
+                </button>
+                <button
+                  type="button"
                   class="btn btn-outline-danger btn-sm"
                   id="deleteSelectedImportsBtn"
                   disabled
@@ -267,6 +275,11 @@
                 <div class="text-muted" id="pendingImportsSummary">Loading imports...</div>
               </div>
             </div>
+            <p class="small text-muted">
+              Choose account and category, then complete each row or select several and choose
+              Complete Selected. Edits are saved only when completed. Review opens the existing
+              individual review page.
+            </p>
             <div class="table-responsive border rounded">
               <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
@@ -282,6 +295,10 @@
                     <th scope="col">Date</th>
                     <th scope="col" class="text-end">Amount</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Account</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Tax Claimable</th>
+                    <th scope="col">Is Regular</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>

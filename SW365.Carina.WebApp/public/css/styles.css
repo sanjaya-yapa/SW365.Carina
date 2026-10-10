@@ -2,7 +2,39 @@ body {
   background-color: #f8f9fa;
 }
 
+.daily-chart-scroll {
+  overflow-x: auto;
+}
+.daily-chart-container {
+  position: relative;
+  height: 380px;
+  min-width: 650px;
+}
+.daily-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+}
+#dailyLegend button[aria-pressed='false'],
+#monthlyLegend button[aria-pressed='false'] {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
 .expense-report-table .report-description {
   min-width: 14rem;
   overflow-wrap: anywhere;
+}
+#pendingImportsSection .import-select {
+  min-width: 150px;
+}
+
+#pendingImportsSection td:nth-child(4) {
+  min-width: 180px;
+  overflow-wrap: anywhere;
+}
+
+#pendingImportsSection td:last-child {
+  min-width: 175px;
 }

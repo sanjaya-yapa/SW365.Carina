@@ -106,6 +106,35 @@ vm/restore-mysql.sh                Remote restore script
 
 If you later decide you want a daily schedule, run step 4 with `-InstallDailySchedule`.
 
+### Update backups on an existing VM
+
+From the `SW365.Carina.Deployment` folder, upload the current backup script and run a fresh backup:
+
+```powershell
+.\scripts\05-run-mysql-backup.ps1 `
+  -VmPublicIp "20.213.93.151" `
+  -AdminUsername "azureuser" `
+  -SshPrivateKeyPath "$env:USERPROFILE\.ssh\id_ed25519_carina" `
+  -UpdateBackupScript
+```
+
+This replaces only the remote backup script. It preserves `/etc/personal-finance-backup.env`,
+the configured schedule, and existing backup blobs. Omit `-UpdateBackupScript` for subsequent runs.
+The VM must already have the backup setup from step 4.
+
+Backups now use MySQL root Unix socket authentication under sudo, as configured by `vm/setup-app.sh`
+and used by the regular-expense migration. This includes routines created by root as well as
+`carina_app`, without granting additional privileges to the application account. The dump uses
+`--no-tablespaces` and retains routines, triggers, and events. Existing database credentials in
+the environment file remain available for the restore script.
+
+Earlier backups may have succeeded before the regular-expense migration created root-owned procedures.
+The old PowerShell completion message alone did not prove success: it did not check SSH's exit code.
+The runner now stops on remote failure. A failed dump is removed before upload; completed dumps are
+checked with `gzip -t` before uploading. Confirm `Backup uploaded: <blob name>` and successful script
+completion. Compression validation does not replace testing a restore into a separate database.
+Do not rerun `03-deploy-database.ps1` to fix backup permissions: it rebuilds application tables.
+
 ## Updating an Existing Azure VM App
 
 ### Is Regular expense field

@@ -9,6 +9,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.get('/vendor/chart.umd.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'node_modules', 'chart.js', 'dist', 'chart.umd.js'));
+});
 
 app.get('/health', (req, res) => {
   return sendSuccess(res, null, 'API is running', 200);

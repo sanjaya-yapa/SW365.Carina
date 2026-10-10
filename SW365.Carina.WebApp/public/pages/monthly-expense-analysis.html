@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Expense Analysis - Personal Finance</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"> <i class="bi bi-wallet2 me-2"></i>Personal Finance </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/"> <i class="bi bi-house-door me-1"></i>Home </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/dashboard.html">
+                <i class="bi bi-bar-chart me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/accounts.html">
+                <i class="bi bi-credit-card me-1"></i>Accounts
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/categories.html">
+                <i class="bi bi-tags me-1"></i>Categories
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/budgets.html">
+                <i class="bi bi-calculator me-1"></i>Budgets
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/transactions.html">
+                <i class="bi bi-arrow-left-right me-1"></i>Transactions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/pages/reports.html">
+                <i class="bi bi-file-earmark-text me-1"></i>Reports
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <a href="/pages/reports.html" class="btn btn-link ps-0 mb-2">&larr; All reports</a>
+      <h1 class="h3">Monthly Expense Analysis</h1>
+      <p class="text-muted">Compare recorded expense spending across all 12 months of a year.</p>
+      <form id="monthlyFilters" class="row g-3 align-items-end mb-4">
+        <div class="col-sm-4 col-md-3">
+          <label for="analysisYear" class="form-label">Year</label
+          ><input
+            id="analysisYear"
+            type="number"
+            min="2000"
+            max="2100"
+            step="1"
+            required
+            class="form-control"
+          />
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <label for="analysisRegular" class="form-label">Is Regular</label
+          ><select id="analysisRegular" class="form-select">
+            <option value="">All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button id="generateAnalysis" type="submit" class="btn btn-primary">
+            Generate report
+          </button>
+        </div>
+      </form>
+      <p id="analysisStatus" role="status" aria-live="polite"></p>
+      <section id="monthlyAnalysis" hidden aria-labelledby="analysisTitle">
+        <h2 id="analysisTitle" class="h5 mb-3"></h2>
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h3 class="h6 text-muted">Total recorded spending</h3>
+                <p id="analysisTotal" class="h4 mb-0"></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h3 class="h6 text-muted">Highest-spending month</h3>
+                <p id="analysisHighest" class="h4 mb-0"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-body">
+            <h3 class="h5">Monthly spending by category</h3>
+            <p class="small text-muted">
+              Select a category to hide or show it in the chart. The table always includes all
+              categories matching the filters.
+            </p>
+            <p id="monthlyChartStatus" role="status"></p>
+            <div
+              id="monthlyLegend"
+              class="d-flex flex-wrap gap-2 mb-3"
+              role="group"
+              aria-label="Chart categories"
+            ></div>
+            <div class="daily-chart-scroll">
+              <div class="daily-chart-container">
+                <canvas
+                  id="monthlySpendingChart"
+                  role="img"
+                  aria-label="Monthly spending stacked by category. Exact amounts are in the table below."
+                ></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="h5">Monthly comparison</h3>
+            <p class="small text-muted">
+              Changes compare with the preceding month in this year. January has no comparison.
+              Months with no recorded expenses, including future months, show zero; this is not a
+              forecast. A current month may be incomplete.
+            </p>
+            <div class="table-responsive">
+              <table class="table table-striped text-nowrap mb-0">
+                <caption>
+                  Recorded spending by month and category. Positive changes mean more spending.
+                  Percent change is unavailable when the preceding month has zero spending.
+                </caption>
+                <thead id="monthlyHead"></thead>
+                <tbody id="monthlyBody"></tbody>
+                <tfoot id="monthlyFoot"></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/vendor/chart.umd.js"></script>
+    <script src="/js/monthly-expense-analysis.js"></script>
+  </body>
+</html>

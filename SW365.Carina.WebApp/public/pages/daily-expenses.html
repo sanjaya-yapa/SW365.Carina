@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Spending - Personal Finance</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"> <i class="bi bi-wallet2 me-2"></i>Personal Finance </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/"> <i class="bi bi-house-door me-1"></i>Home </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/dashboard.html">
+                <i class="bi bi-bar-chart me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/accounts.html">
+                <i class="bi bi-credit-card me-1"></i>Accounts
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/categories.html">
+                <i class="bi bi-tags me-1"></i>Categories
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/budgets.html">
+                <i class="bi bi-calculator me-1"></i>Budgets
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/transactions.html">
+                <i class="bi bi-arrow-left-right me-1"></i>Transactions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/pages/reports.html">
+                <i class="bi bi-file-earmark-text me-1"></i>Reports
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <a href="/pages/reports.html" class="btn btn-link ps-0 mb-2">&larr; All reports</a>
+      <h1 class="h3">Daily spending and expense details</h1>
+      <p class="text-muted">
+        Expenses grouped by category, with category totals and a grand total.
+      </p>
+      <form id="reportFilters" class="row g-3 align-items-end mb-4">
+        <div class="col-sm-5 col-md-3">
+          <label for="reportMonth" class="form-label">Month</label>
+          <input
+            id="reportMonth"
+            type="month"
+            class="form-control"
+            min="2000-01"
+            max="2100-12"
+            required
+          />
+        </div>
+        <div class="col-sm-5 col-md-3">
+          <label for="reportRegular" class="form-label">Is Regular</label>
+          <select id="reportRegular" class="form-select">
+            <option value="" selected>All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button id="generateReport" class="btn btn-primary" type="submit">Generate report</button>
+        </div>
+      </form>
+      <p id="reportStatus" role="status" aria-live="polite"></p>
+      <section id="dailyReport" class="card mb-4" aria-labelledby="dailyTitle" hidden>
+        <div class="card-header d-flex flex-wrap justify-content-between gap-2 align-items-center">
+          <h2 id="dailyTitle" class="h5 mb-0">Daily spending by category</h2>
+          <div class="btn-group" role="group" aria-label="Daily spending view">
+            <button
+              id="dailyChartButton"
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              aria-pressed="true"
+              aria-controls="dailyChartPanel"
+            >
+              Chart
+            </button>
+            <button
+              id="dailyTableButton"
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              aria-pressed="false"
+              aria-controls="dailyTablePanel"
+            >
+              Daily table
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <p id="dailySummary" class="fw-semibold"></p>
+          <p id="dailyChartStatus" role="status" class="text-muted"></p>
+          <div id="dailyChartPanel">
+            <p class="small text-muted">
+              Select a category below to hide or show it in the chart. The daily table and detailed
+              report always include all categories matching the report filters.
+            </p>
+            <div
+              id="dailyLegend"
+              class="d-flex flex-wrap gap-2 mb-3"
+              role="group"
+              aria-label="Chart categories"
+            ></div>
+            <div class="daily-chart-scroll">
+              <div class="daily-chart-container">
+                <canvas
+                  id="dailySpendingChart"
+                  role="img"
+                  aria-label="Daily spending stacked by category. Use the Daily table button for exact amounts."
+                ></canvas>
+              </div>
+            </div>
+          </div>
+          <div id="dailyTablePanel" class="table-responsive" hidden>
+            <table class="table table-sm table-striped text-nowrap">
+              <caption>
+                Daily spending for all categories matching the month and Is Regular filters,
+                including days with no spending.
+              </caption>
+              <thead id="dailyTableHead"></thead>
+              <tbody id="dailyTableBody"></tbody>
+              <tfoot id="dailyTableFoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+      <section id="expenseReport" class="card" aria-labelledby="reportTitle" hidden>
+        <div class="card-header"><h2 id="reportTitle" class="h5 mb-0"></h2></div>
+        <div class="table-responsive">
+          <table class="table mb-0 expense-report-table">
+            <caption class="visually-hidden">
+              Monthly expenses by category, including subtotals and grand total
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Category / Expense</th>
+                <th scope="col">Date</th>
+                <th scope="col">Account</th>
+                <th scope="col">Is Regular</th>
+                <th scope="col" class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="reportRows"></tbody>
+            <tfoot>
+              <tr class="table-dark">
+                <th scope="row" colspan="4">Grand Total</th>
+                <td id="grandTotal" class="text-end fw-bold"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/vendor/chart.umd.js"></script>
+    <script src="/js/daily-spending.js"></script>
+    <script src="/js/reports.js"></script>
+  </body>
+</html>

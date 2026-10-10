@@ -89,8 +89,22 @@ async function getMonthlyExpenses(req, res) {
 }
 
 module.exports = {
+  getMonthlyAnalysis,
   getMonthlyExpenses,
   getMonthSummary,
   getMonthCategoryVariance,
   getAnnualExpenseTrend,
 };
+
+async function getMonthlyAnalysis(req, res) {
+  try {
+    const result = await reportsService.getMonthlyAnalysis(
+      Number(req.query.year),
+      req.query.isRegular === undefined ? null : req.query.isRegular === 'true'
+    );
+    return sendSuccess(res, result, 'Monthly expense analysis retrieved successfully', 200);
+  } catch (err) {
+    const mapped = mapServiceError(err);
+    return sendError(res, mapped.message, null, mapped.statusCode);
+  }
+}
