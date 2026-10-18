@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,9 +18,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-          <i class="bi bi-wallet2 me-2"></i>Personal Finance
-        </a>
+        <a class="navbar-brand" href="/"> <i class="bi bi-wallet2 me-2"></i>Personal Finance </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -35,9 +33,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="bi bi-house-door me-1"></i>Home
-              </a>
+              <a class="nav-link" href="/"> <i class="bi bi-house-door me-1"></i>Home </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/pages/dashboard.html">
@@ -65,6 +61,11 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/pages/payments.html"
+                ><i class="bi bi-calendar-check me-1"></i>Payments</a
+              >
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/pages/reports.html">
                 <i class="bi bi-file-earmark-text me-1"></i>Reports
               </a>
@@ -77,15 +78,16 @@
     <!-- Main Content -->
     <main class="container py-5">
       <h1 class="h2 mb-4">Personal Finance Budget App</h1>
-      
+
       <div class="row g-4">
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h5 class="card-title">
-                <i class="bi bi-bar-chart text-primary me-2"></i>Dashboard
-              </h5>
-              <p class="card-text">View your monthly summary, compare planned vs actual expenses, and see your financial overview.</p>
+              <h5 class="card-title"><i class="bi bi-bar-chart text-primary me-2"></i>Dashboard</h5>
+              <p class="card-text">
+                View your monthly summary, compare planned vs actual expenses, and see your
+                financial overview.
+              </p>
               <a href="/pages/dashboard.html" class="btn btn-primary btn-sm">
                 Open Dashboard <i class="bi bi-arrow-right ms-1"></i>
               </a>
@@ -99,7 +101,10 @@
               <h5 class="card-title">
                 <i class="bi bi-arrow-left-right text-success me-2"></i>Transactions
               </h5>
-              <p class="card-text">Record income and expense transactions, track your spending, and manage your accounts.</p>
+              <p class="card-text">
+                Record income and expense transactions, track your spending, and manage your
+                accounts.
+              </p>
               <a href="/pages/transactions.html" class="btn btn-success btn-sm">
                 View Transactions <i class="bi bi-arrow-right ms-1"></i>
               </a>
@@ -110,10 +115,11 @@
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h5 class="card-title">
-                <i class="bi bi-credit-card text-info me-2"></i>Accounts
-              </h5>
-              <p class="card-text">Manage your bank accounts, wallets, and credit cards. Track opening balances and account status.</p>
+              <h5 class="card-title"><i class="bi bi-credit-card text-info me-2"></i>Accounts</h5>
+              <p class="card-text">
+                Manage your bank accounts, wallets, and credit cards. Track opening balances and
+                account status.
+              </p>
               <a href="/pages/accounts.html" class="btn btn-info btn-sm">
                 Manage Accounts <i class="bi bi-arrow-right ms-1"></i>
               </a>
@@ -124,10 +130,11 @@
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h5 class="card-title">
-                <i class="bi bi-tags text-warning me-2"></i>Categories
-              </h5>
-              <p class="card-text">Organize your spending with income and expense categories. Customize your budget structure.</p>
+              <h5 class="card-title"><i class="bi bi-tags text-warning me-2"></i>Categories</h5>
+              <p class="card-text">
+                Organize your spending with income and expense categories. Customize your budget
+                structure.
+              </p>
               <a href="/pages/categories.html" class="btn btn-warning btn-sm">
                 Manage Categories <i class="bi bi-arrow-right ms-1"></i>
               </a>
@@ -138,10 +145,10 @@
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h5 class="card-title">
-                <i class="bi bi-calculator text-danger me-2"></i>Budgets
-              </h5>
-              <p class="card-text">Set monthly budget plans for each category and compare against actual spending.</p>
+              <h5 class="card-title"><i class="bi bi-calculator text-danger me-2"></i>Budgets</h5>
+              <p class="card-text">
+                Set monthly budget plans for each category and compare against actual spending.
+              </p>
               <a href="/pages/budgets.html" class="btn btn-danger btn-sm">
                 Plan Budgets <i class="bi bi-arrow-right ms-1"></i>
               </a>
@@ -155,7 +162,10 @@
               <h5 class="card-title">
                 <i class="bi bi-file-earmark-text text-secondary me-2"></i>Reports
               </h5>
-              <p class="card-text">Analyze annual trends, monthly variance by category, and understand your spending patterns.</p>
+              <p class="card-text">
+                Analyze annual trends, monthly variance by category, and understand your spending
+                patterns.
+              </p>
               <a href="/pages/reports.html" class="btn btn-secondary btn-sm">
                 View Reports <i class="bi bi-arrow-right ms-1"></i>
               </a>

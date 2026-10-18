@@ -15,6 +15,7 @@ let selectedTransactionIds = new Set();
 let selectedPendingImportIds = new Set();
 let currentPage = 1;
 let pageSize = 10;
+let transactionLookupsReady = false;
 const importDrafts = new Map();
 let completingImports = false;
 
@@ -227,11 +228,31 @@ function createTaxClaimableBadge(value) {
 }
 
 async function fetchJson(url, options) {
-  const response = await fetch(url, options);
-  const result = await response.json();
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch (error) {
+    throw new Error(
+      `Cannot reach ${url}. Check your connection and that the application is running.`
+    );
+  }
+  const responseText = await response.text();
+  let result;
+  try {
+    result = JSON.parse(responseText);
+  } catch (error) {
+    const hint = [502, 503, 504].includes(response.status)
+      ? 'The web server cannot reach the application or it timed out. Check the Azure application service.'
+      : 'The server returned a web page or invalid response instead of API data. Check the application URL and server routing.';
+    throw new Error(`Request to ${url} failed (HTTP ${response.status}). ${hint}`);
+  }
 
-  if (!response.ok || !result.success) {
-    throw new Error(result.message || 'Request failed');
+  if (!response.ok || !result || result.success !== true) {
+    throw new Error(
+      typeof result?.message === 'string'
+        ? result.message
+        : `Request to ${url} failed (HTTP ${response.status}). Invalid API response.`
+    );
   }
 
   return result.data || [];
@@ -312,6 +333,20 @@ async function loadLookups() {
 
   populateAccountOptions();
   populateCategoryOptions();
+  transactionLookupsReady = true;
+}
+
+async function loadTransactionPage() {
+  if (completingImports) return;
+  try {
+    if (!transactionLookupsReady) await loadLookups();
+    await Promise.all([loadTransactions(), loadPendingImports()]);
+  } catch (error) {
+    window.showMessage(`Error initializing transactions page: ${error.message}`, 'danger', 0);
+    document.getElementById('transactionSummary').textContent =
+      'Unable to load accounts and categories. Use Load to retry.';
+    document.getElementById('pendingImportsSummary').textContent = 'Imports could not be loaded.';
+  }
 }
 
 function getFilterValues() {
@@ -1019,8 +1054,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   document.getElementById('transactionFilterForm')?.addEventListener('submit', function (event) {
     event.preventDefault();
     if (completingImports) return;
-    loadTransactions();
-    loadPendingImports();
+    loadTransactionPage();
   });
   document.getElementById('bankImportForm')?.addEventListener('submit', handleBankImportSubmit);
   document
@@ -1044,12 +1078,5 @@ document.addEventListener('DOMContentLoaded', async function () {
     renderTransactions();
   });
 
-  try {
-    await loadLookups();
-    await loadTransactions();
-    await loadPendingImports();
-  } catch (error) {
-    console.error('Failed to initialize transactions page', error);
-    window.showMessage(`Error initializing transactions page: ${error.message}`, 'danger', 0);
-  }
+  await loadTransactionPage();
 });

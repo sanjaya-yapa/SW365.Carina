@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payments - Personal Finance</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"> <i class="bi bi-wallet2 me-2"></i>Personal Finance </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/"> <i class="bi bi-house-door me-1"></i>Home </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/dashboard.html">
+                <i class="bi bi-bar-chart me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/accounts.html">
+                <i class="bi bi-credit-card me-1"></i>Accounts
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/categories.html">
+                <i class="bi bi-tags me-1"></i>Categories
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/budgets.html">
+                <i class="bi bi-calculator me-1"></i>Budgets
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/transactions.html">
+                <i class="bi bi-arrow-left-right me-1"></i>Transactions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/pages/payments.html"
+                ><i class="bi bi-calendar-check me-1"></i>Payments</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/pages/reports.html">
+                <i class="bi bi-file-earmark-text me-1"></i>Reports
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4">
+      <h1 class="h3">Regular Payments</h1>
+      <p class="text-muted">
+        Plan upcoming bills and link recorded expenses when paid. Scheduled amounts do not count as
+        spending.
+      </p>
+      <p id="paymentsStatus" role="status" aria-live="polite"></p>
+      <form id="paymentFilters" class="d-flex flex-wrap gap-2 align-items-end mb-3">
+        <div>
+          <label class="form-label" for="paymentMonth">Calendar month</label
+          ><input
+            id="paymentMonth"
+            class="form-control"
+            type="month"
+            min="2000-01"
+            max="2100-12"
+            required
+          />
+        </div>
+        <button class="btn btn-primary">Refresh</button>
+      </form>
+      <section id="paymentsResults" hidden>
+        <p id="paymentSummary" class="fw-semibold"></p>
+        <h2 class="h5">Next 7 days</h2>
+        <div id="upcomingPayments" class="mb-4"></div>
+        <div class="d-flex gap-2 mb-3" role="group" aria-label="Payment view">
+          <button id="calendarView" class="btn btn-outline-primary" aria-pressed="true">
+            Calendar</button
+          ><button id="agendaView" class="btn btn-outline-primary" aria-pressed="false">
+            Agenda
+          </button>
+        </div>
+        <p class="small text-muted">
+          Select a payment to link an expense, skip it or undo its status. Today?s payments are
+          upcoming; earlier unpaid dates are overdue.
+        </p>
+        <div id="paymentCalendarWrap" class="table-responsive mb-4">
+          <div id="paymentCalendar" class="payment-calendar"></div>
+        </div>
+        <div id="paymentAgenda" hidden class="mb-4"></div>
+      </section>
+      <section id="occurrencePanel" class="card mb-4" hidden aria-labelledby="occurrenceTitle">
+        <div class="card-body">
+          <h2 id="occurrenceTitle" class="h5" tabindex="-1"></h2>
+          <p id="occurrenceDetails"></p>
+          <p class="small text-muted">
+            Complete a pending CSV import first, then select the resulting transaction here. Only
+            expenses from the scheduled account and category are shown. The actual amount may differ
+            from the expected amount.
+          </p>
+          <label for="linkMonth" class="form-label">Transaction month</label
+          ><input
+            id="linkMonth"
+            type="month"
+            min="2000-01"
+            max="2100-12"
+            class="form-control mb-2"
+          />
+          <label for="linkTransaction" class="form-label">Recorded expense</label
+          ><select id="linkTransaction" class="form-select mb-2"></select>
+          <p id="linkStatus" role="status"></p>
+          <div class="d-flex flex-wrap gap-2">
+            <button id="linkPayment" class="btn btn-success">Link expense / mark paid</button
+            ><button id="skipPayment" class="btn btn-outline-secondary">Skip this occurrence</button
+            ><button id="resetPayment" class="btn btn-outline-secondary">Undo paid / skipped</button
+            ><button id="closeOccurrence" class="btn btn-link">Close</button>
+          </div>
+        </div>
+      </section>
+      <details class="card mb-4">
+        <summary class="card-header">Add payment schedule</summary>
+        <form id="scheduleForm" class="card-body row g-3">
+          <div class="col-md-6">
+            <label for="paymentName" class="form-label">Payment name</label
+            ><input id="paymentName" maxlength="100" required class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label for="paymentAmount" class="form-label">Expected amount ($)</label
+            ><input
+              id="paymentAmount"
+              type="number"
+              min="0.01"
+              max="9999999999.99"
+              step="0.01"
+              required
+              class="form-control"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="paymentAccount" class="form-label">Account</label
+            ><select id="paymentAccount" required class="form-select"></select>
+          </div>
+          <div class="col-md-6">
+            <label for="paymentCategory" class="form-label">Expense category</label
+            ><select id="paymentCategory" required class="form-select"></select>
+          </div>
+          <div class="col-md-4">
+            <label for="paymentFrequency" class="form-label">Frequency</label
+            ><select id="paymentFrequency" class="form-select">
+              <option value="WEEKLY">Weekly</option>
+              <option value="FORTNIGHTLY">Fortnightly</option>
+              <option value="MONTHLY" selected>Monthly</option>
+              <option value="QUARTERLY">Quarterly</option>
+              <option value="YEARLY">Yearly</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="paymentStart" class="form-label">Next due date</label
+            ><input
+              id="paymentStart"
+              type="date"
+              min="2000-01-01"
+              max="2100-12-31"
+              required
+              class="form-control"
+            />
+          </div>
+          <div class="col-md-4">
+            <label for="paymentEnd" class="form-label">End date (optional)</label
+            ><input
+              id="paymentEnd"
+              type="date"
+              min="2000-01-01"
+              max="2100-12-31"
+              class="form-control"
+            />
+          </div>
+          <div class="col-12">
+            <button id="saveSchedule" class="btn btn-primary">Create schedule</button>
+            <p class="small text-muted mt-2">
+              Monthly schedules use the original day, or the last day of shorter months. To change a
+              schedule, end it and create a replacement.
+            </p>
+          </div>
+        </form>
+      </details>
+      <section>
+        <h2 class="h5">Payment schedules</h2>
+        <div id="scheduleList"></div>
+      </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/payments.js"></script>
+  </body>
+</html>

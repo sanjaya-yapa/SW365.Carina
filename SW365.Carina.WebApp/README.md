@@ -67,6 +67,20 @@ API: `GET /api/reports/monthly-analysis?year=2026`, optionally with
 `isRegular=true` or `isRegular=false`. No database migration is needed.
 See `../SW365.Carina.Deployment/REPORTS-LANDING-UPDATE.md` for deployment steps.
 
+## Regular Payments
+
+Open **Payments** to create manual weekly, fortnightly, monthly, quarterly or yearly
+schedules. The monthly calendar and agenda show Upcoming, Overdue, Paid and Skipped
+occurrences, with a next-seven-days list. Scheduled amounts never generate expenses.
+To mark paid, complete any pending CSV import first and link the resulting expense
+from the same account and category. Undo unlinks it without deleting the transaction.
+To change a schedule, set its end date and create a replacement.
+
+Existing installations must apply the additive payment-schedules migration before
+updating the app. See `../SW365.Carina.Deployment/PAYMENTS-UPDATE.md` for the backup,
+migration and application-update sequence. Existing Is Regular flags remain separate
+from payment schedules. Run all checks with `node --test test/*.test.js`.
+
 ## Development commands
 
 - `npm start` - run server once

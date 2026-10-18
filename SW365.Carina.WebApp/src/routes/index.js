@@ -19,5 +19,6 @@ router.use('/budgets', budgetsRouter);
 router.use('/transactions', transactionsRouter);
 router.use('/bank-imports', bankImportsRouter);
 router.use('/reports', reportsRouter);
+router.use('/payments', require('./payments.routes'));
 
 module.exports = router;
