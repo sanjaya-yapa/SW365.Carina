@@ -200,7 +200,8 @@ async function completeImport(
   accountId,
   categoryId,
   isTaxClaimable = false,
-  isRegular = false
+  isRegular = false,
+  ownerId = null
 ) {
   const importRow = await getImportById(id);
 
@@ -226,7 +227,7 @@ async function completeImport(
     await connection.beginTransaction();
 
     const [procedureRows] = await connection.execute(
-      'CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?)',
+      'CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?, ?)',
       [
         importRow.txn_date,
         accountId,
@@ -235,6 +236,7 @@ async function completeImport(
         finalTaxClaimable,
         importRow.description,
         expectedCategoryType === 'EXPENSE' ? isRegular : false,
+        ownerId,
       ]
     );
 

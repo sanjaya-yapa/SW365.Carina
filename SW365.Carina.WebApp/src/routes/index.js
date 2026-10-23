@@ -17,6 +17,7 @@ router.use('/accounts', accountsRouter);
 router.use('/categories', categoriesRouter);
 router.use('/budgets', budgetsRouter);
 router.use('/transactions', transactionsRouter);
+router.use('/transaction-owners', require('./transaction-owners.routes'));
 router.use('/bank-imports', bankImportsRouter);
 router.use('/reports', reportsRouter);
 router.use('/payments', require('./payments.routes'));

@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS payment_occurrences;
 DROP TABLE IF EXISTS payment_schedules;
 DROP TABLE IF EXISTS bank_transaction_imports;
 DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS transaction_owners;
 DROP TABLE IF EXISTS budget_plans;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS accounts;
@@ -88,11 +89,23 @@ CREATE TABLE budget_plans (
 		ON DELETE RESTRICT
 );
 
+CREATE TABLE transaction_owners (
+	owner_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	first_name VARCHAR(100) NOT NULL,
+	last_name VARCHAR(100) NOT NULL,
+	full_name VARCHAR(201) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) STORED,
+	email_address VARCHAR(254) NULL,
+	phone_number VARCHAR(50) NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE transactions (
 	transaction_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	txn_date DATE NOT NULL,
 	account_id BIGINT UNSIGNED NOT NULL,
 	category_id BIGINT UNSIGNED NOT NULL,
+	owner_id BIGINT UNSIGNED NULL,
 	amount DECIMAL(12, 2) NOT NULL,
 	is_tax_claimable BOOLEAN NOT NULL DEFAULT FALSE,
 	is_regular BOOLEAN NOT NULL DEFAULT FALSE,
@@ -104,6 +117,9 @@ CREATE TABLE transactions (
 	KEY idx_transactions_txn_date (txn_date),
 	KEY idx_transactions_category_id (category_id),
 	KEY idx_transactions_account_id (account_id),
+	CONSTRAINT fk_transactions_owner
+		FOREIGN KEY (owner_id) REFERENCES transaction_owners (owner_id)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
 	KEY idx_transactions_date_category (txn_date, category_id),
 	KEY idx_transactions_date_account (txn_date, account_id),
 	CONSTRAINT chk_transactions_amount CHECK (amount > 0),

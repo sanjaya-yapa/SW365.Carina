@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transaction Owners - Personal Finance</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Personal Finance</a>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/pages/transactions.html">Transactions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/pages/transaction-owners.html" aria-current="page"
+              >Owners</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="container py-4">
+      <h1 class="h3">Transaction Owners</h1>
+      <p class="text-muted">
+        An owner can be assigned to multiple transactions. Contact details are optional.
+      </p>
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-header"><h2 class="h5 mb-0" id="ownerFormTitle">Add Owner</h2></div>
+            <div class="card-body">
+              <form id="ownerForm">
+                <div class="mb-3">
+                  <label class="form-label" for="firstName">First Name</label>
+                  <input class="form-control" id="firstName" maxlength="100" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="lastName">Last Name</label>
+                  <input class="form-control" id="lastName" maxlength="100" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="fullName">Full Name</label>
+                  <input
+                    class="form-control"
+                    id="fullName"
+                    readonly
+                    aria-describedby="fullNameHelp"
+                  />
+                  <div class="form-text" id="fullNameHelp">
+                    Generated from first and last names.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="emailAddress">Email Address</label>
+                  <input class="form-control" id="emailAddress" type="email" maxlength="254" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="phoneNumber">Phone Number</label>
+                  <input class="form-control" id="phoneNumber" type="tel" maxlength="50" />
+                </div>
+                <button class="btn btn-success" type="submit" id="saveOwnerBtn" disabled>
+                  Save Owner
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="cancelEditBtn">
+                  Clear / Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <p id="ownersStatus" role="status">Loading owners...</p>
+          <button class="btn btn-outline-secondary btn-sm mb-3" type="button" id="reloadOwnersBtn">
+            Reload Owners
+          </button>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">Full Name</th>
+                  <th scope="col">Email Address</th>
+                  <th scope="col">Phone Number</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ownersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="/js/main.js"></script>
+    <script src="/js/transaction-owners.js"></script>
+  </body>
+</html>

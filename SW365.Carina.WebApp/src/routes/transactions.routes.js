@@ -7,12 +7,14 @@ const {
   validateDate,
   validatePositiveDecimal,
   validateOptionalBoolean,
+  validateOptionalOwnerId,
 } = require('../middleware/validate-request');
 
 const router = express.Router();
 
 // Validators for POST/PUT body
 const transactionBodyValidators = [
+  validateOptionalOwnerId,
   validateDate('txnDate'), // date must be YYYY-MM-DD
   validatePositiveIntRange('accountId', 1, Number.MAX_SAFE_INTEGER),
   validatePositiveIntRange('categoryId', 1, Number.MAX_SAFE_INTEGER),

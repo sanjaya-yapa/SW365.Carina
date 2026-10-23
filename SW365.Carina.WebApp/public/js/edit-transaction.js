@@ -86,11 +86,16 @@ function appendOption(selectElement, value, label) {
 }
 
 async function loadLookups() {
-  const [accounts, categories] = await Promise.all([
+  const [accounts, categories, owners] = await Promise.all([
     fetchJson(`${ACCOUNTS_API_BASE}?status=active`),
     fetchJson(`${CATEGORIES_API_BASE}?status=active`),
+    fetchJson('/api/transaction-owners'),
   ]);
   activeCategories = categories;
+  const ownerSelect = document.getElementById('ownerId');
+  ownerSelect.replaceChildren();
+  appendOption(ownerSelect, '', 'Unassigned');
+  owners.forEach((owner) => appendOption(ownerSelect, owner.owner_id, owner.full_name));
 
   const accountSelect = document.getElementById('accountId');
   const categorySelect = document.getElementById('categoryId');
@@ -139,6 +144,7 @@ async function loadTransaction() {
       getSelectedCategoryType() === 'EXPENSE' && Number(transaction.is_regular) === 1
     );
     document.getElementById('note').value = transaction.note || '';
+    document.getElementById('ownerId').value = transaction.owner_id ?? '';
   } catch (error) {
     console.error('Failed to load transaction', error);
     window.showMessage(`Error loading transaction: ${error.message}`, 'danger', 0);
@@ -150,6 +156,9 @@ function getFormPayload() {
     txnDate: document.getElementById('txnDate').value,
     accountId: Number(document.getElementById('accountId').value),
     categoryId: Number(document.getElementById('categoryId').value),
+    ownerId: document.getElementById('ownerId').value
+      ? Number(document.getElementById('ownerId').value)
+      : null,
     amount: Number(document.getElementById('amount').value),
     isTaxClaimable: document.getElementById('isTaxClaimable').checked,
     isRegular: document.getElementById('isRegular').value === 'true',

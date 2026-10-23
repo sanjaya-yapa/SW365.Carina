@@ -58,6 +58,9 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/pages/transaction-owners.html">Owners</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/pages/payments.html"
                 ><i class="bi bi-calendar-check me-1"></i>Payments</a
               >
@@ -151,6 +154,14 @@
                   <div class="form-text">
                     Indicates a regular expense; does not create recurring transactions.
                   </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="ownerId" class="form-label">Transaction Owner</label>
+                  <select class="form-select" id="ownerId">
+                    <option value="">Unassigned</option>
+                  </select>
+                  <a href="/pages/transaction-owners.html" class="form-text">Manage owners</a>
                 </div>
 
                 <div class="mb-4">
@@ -281,9 +292,9 @@
               </div>
             </div>
             <p class="small text-muted">
-              Choose account and category, then complete each row or select several and choose
-              Complete Selected. Edits are saved only when completed. Review opens the existing
-              individual review page.
+              Choose account, category, and an optional owner, then complete each row or select
+              several and choose Complete Selected. Edits are saved only when completed. Review
+              opens the existing individual review page.
             </p>
             <div class="table-responsive border rounded">
               <table class="table table-hover align-middle mb-0">
@@ -304,6 +315,7 @@
                     <th scope="col">Category</th>
                     <th scope="col">Tax Claimable</th>
                     <th scope="col">Is Regular</th>
+                    <th scope="col">Owner</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
@@ -333,6 +345,7 @@
                   <th scope="col">Is Regular</th>
                   <th scope="col" class="text-end">Amount</th>
                   <th scope="col">Note</th>
+                  <th scope="col">Owner</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>

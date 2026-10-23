@@ -71,7 +71,8 @@ async function completeImport(req, res) {
       accountId,
       categoryId,
       isTaxClaimable,
-      isRegular
+      isRegular,
+      req.body.ownerId
     );
 
     return sendSuccess(res, importRow, 'Imported bank transaction completed successfully', 200);

@@ -9,6 +9,34 @@ This folder contains scripts for a low-cost Azure deployment where one small Lin
 
 This is intended for light personal usage where the VM can be deallocated when the app is not needed.
 
+## Transaction owner update (existing installations)
+
+This update adds optional transaction owners and changes transaction stored procedure
+signatures. Apply the database and matching application together during a maintenance
+window; the old application cannot write transactions using the new signatures.
+
+1. Take a current database backup using the existing backup procedure.
+2. Stop the application service before changing the procedures.
+3. Apply the additive schema migration and refreshed procedures:
+
+   ```powershell
+   .\scripts\13-update-database-add-transaction-owners.ps1 -VmPublicIp "<VM-IP>"
+   ```
+
+   This runs `sql-updates/2026-10-22-add-transaction-owners.sql`, then the current
+   `../SW365.Carina.WebApp/sql/procedures.sql`. It preserves existing transactions,
+   leaving their owner unassigned. Do not run the destructive initial schema.
+   The migration may be retried if a deployment is interrupted.
+
+4. Deploy the matching application with `scripts/07-update-application.ps1`, then
+   restart/verify the application using the existing deployment steps.
+5. Open **Transactions → Owners**, create an owner, then verify assignment when
+   adding/editing a transaction and completing a bank import.
+
+The script does not stop/start services automatically. If either SQL step fails,
+keep the app stopped, resolve the error and rerun the update before starting it.
+For rollback, restore the backup and matching previous app version together.
+
 ## Prerequisites
 
 - Azure CLI installed locally

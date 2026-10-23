@@ -56,6 +56,7 @@ function setup() {
   const run = (code) => vm.runInContext(code, context);
   run(fs.readFileSync(path.join(__dirname, '../public/js/transactions.js'), 'utf8'));
   run(`activeAccounts = [{account_id: 1, account_name: 'Bank'}];
+    transactionOwners = [{owner_id: 7, full_name: 'Test Owner'}];
     activeCategories = [
       {category_id: 2, category_name: 'Bills', category_type: 'EXPENSE'},
       {category_id: 3, category_name: 'Salary', category_type: 'INCOME'},
@@ -77,10 +78,15 @@ test('inline controls filter categories, retain edits on rerender and preserve R
   account.listeners.change();
   category.value = '2';
   category.listeners.change();
+  const owner = row.children[8].firstChild;
+  assert.equal(owner.children[1].textContent, 'Test Owner');
+  owner.value = '7';
+  owner.listeners.change();
   const rerendered = run('createPendingImportRow(pendingImports[0])');
   assert.equal(rerendered.children[4].firstChild.value, '1');
   assert.equal(rerendered.children[5].firstChild.value, '2');
-  assert.equal(rerendered.children[8].children[1].href, '/pages/edit-bank-import.html?id=1');
+  assert.equal(rerendered.children[8].firstChild.value, '7');
+  assert.equal(rerendered.children[9].children[1].href, '/pages/edit-bank-import.html?id=1');
   const income = run('createPendingImportRow({import_id: 4, signed_amount: 10})');
   assert.equal(income.children[5].firstChild.children[1].textContent, 'Salary');
   assert.equal(income.children[6].firstChild.disabled, true);
@@ -95,13 +101,14 @@ test('batch completion retains failed and unselected drafts and validates missin
     if (url.includes('/2/')) throw new Error('Request failed');
   };
   run(`for (const id of [1, 2, 3]) Object.assign(getImportDraft(id), {
-    accountId: '1', categoryId: '2', isTaxClaimable: true, isRegular: true, dirty: true
+    accountId: '1', categoryId: '2', ownerId: '7', isTaxClaimable: true, isRegular: true, dirty: true
   }); selectedPendingImportIds = new Set([1, 2]);`);
   await run('completePendingImports([1, 2])');
   assert.equal(calls.length, 2);
   assert.deepEqual(calls[0].payload, {
     accountId: 1,
     categoryId: 2,
+    ownerId: 7,
     isTaxClaimable: true,
     isRegular: true,
   });
@@ -109,6 +116,7 @@ test('batch completion retains failed and unselected drafts and validates missin
   assert.equal(run('importDrafts.has(1)'), false);
   assert.equal(run('getImportDraft(2).error'), 'Request failed');
   assert.equal(run('getImportDraft(3).categoryId'), '2');
+  assert.equal(run('getImportDraft(3).ownerId'), '7');
   assert.equal(run('selectedPendingImportIds.has(2)'), true);
   run("getImportDraft(2).categoryId = ''");
   await run('completePendingImports([2])');

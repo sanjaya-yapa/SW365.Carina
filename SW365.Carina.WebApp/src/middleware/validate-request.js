@@ -238,7 +238,22 @@ function validateOptionalBoolean(fieldName, options = {}) {
   };
 }
 
+function validateOptionalOwnerId(req) {
+  const value = req.body.ownerId;
+  if (value === undefined || value === null) return null;
+  if (
+    !['string', 'number'].includes(typeof value) ||
+    !Number.isSafeInteger(Number(value)) ||
+    Number(value) <= 0
+  ) {
+    return { field: 'ownerId', message: 'ownerId must be a positive integer or null' };
+  }
+  req.body.ownerId = Number(value);
+  return null;
+}
+
 module.exports = {
+  validateOptionalOwnerId,
   validateRequest,
   validatePositiveIntParam,
   validateRequiredString,

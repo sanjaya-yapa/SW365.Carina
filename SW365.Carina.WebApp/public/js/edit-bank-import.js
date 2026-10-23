@@ -83,11 +83,16 @@ function updateTaxClaimableState() {
 }
 
 async function loadLookups() {
-  const [accounts, categories] = await Promise.all([
+  const [accounts, categories, owners] = await Promise.all([
     fetchJson(`${ACCOUNTS_API_BASE}?status=active`),
     fetchJson(`${CATEGORIES_API_BASE}?status=active`),
+    fetchJson('/api/transaction-owners'),
   ]);
   activeCategories = categories;
+  const ownerSelect = document.getElementById('ownerId');
+  ownerSelect.replaceChildren();
+  appendOption(ownerSelect, '', 'Unassigned');
+  owners.forEach((owner) => appendOption(ownerSelect, owner.owner_id, owner.full_name));
 
   const accountSelect = document.getElementById('accountId');
   const categorySelect = document.getElementById('categoryId');
@@ -153,6 +158,9 @@ async function handleCompleteImport(event) {
       body: JSON.stringify({
         accountId: Number(document.getElementById('accountId').value),
         categoryId: Number(document.getElementById('categoryId').value),
+        ownerId: document.getElementById('ownerId').value
+          ? Number(document.getElementById('ownerId').value)
+          : null,
         isTaxClaimable: document.getElementById('isTaxClaimable').checked,
         isRegular: document.getElementById('isRegular').value === 'true',
       }),

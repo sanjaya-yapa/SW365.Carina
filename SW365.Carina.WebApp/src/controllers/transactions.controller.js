@@ -7,7 +7,7 @@ function mapServiceError(err) {
   const lowered = message.toLowerCase();
 
   if (lowered.includes('not found') || lowered.includes('does not exist')) {
-    return { statusCode: 404, message: 'Transaction, account, or category not found' };
+    return { statusCode: 404, message: 'Transaction, account, category, or owner not found' };
   }
 
   if (lowered.includes('at least one') || lowered.includes('positive integers')) {
@@ -64,7 +64,7 @@ async function getTransactionById(req, res) {
 /**
  * POST /api/transactions
  * Create a new transaction
- * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note, isRegular }
+ * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note, isRegular, ownerId }
  */
 async function createTransaction(req, res) {
   try {
@@ -85,7 +85,8 @@ async function createTransaction(req, res) {
       amount,
       isTaxClaimable,
       note || null,
-      isRegular
+      isRegular,
+      req.body.ownerId
     );
     console.log('✅ DEBUG: Controller received result from service:', result);
 
@@ -99,7 +100,7 @@ async function createTransaction(req, res) {
 /**
  * PUT /api/transactions/:id
  * Update an existing transaction
- * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note, isRegular }
+ * Request body: { txnDate, accountId, categoryId, amount, isTaxClaimable, note, isRegular, ownerId }
  */
 async function updateTransaction(req, res) {
   try {
@@ -123,7 +124,8 @@ async function updateTransaction(req, res) {
       amount,
       isTaxClaimable,
       note || null,
-      isRegular
+      isRegular,
+      req.body.ownerId
     );
     console.log('✅ DEBUG: Controller received result from service:', result);
 

@@ -112,12 +112,15 @@ async function getTransactionById(id) {
       t.amount,
       t.is_tax_claimable,
       t.is_regular,
+      t.owner_id,
+      o.full_name AS owner_full_name,
       t.note,
       t.created_at,
       t.updated_at
     FROM transactions t
     INNER JOIN accounts a ON a.account_id = t.account_id
     INNER JOIN categories c ON c.category_id = t.category_id
+    LEFT JOIN transaction_owners o ON o.owner_id = t.owner_id
     WHERE t.transaction_id = ?
     LIMIT 1`,
     [id]
@@ -148,7 +151,8 @@ async function addTransaction(
   amount,
   isTaxClaimable,
   note = null,
-  isRegular = false
+  isRegular = false,
+  ownerId = null
 ) {
   try {
     console.log('🔍 DEBUG: addTransaction called with:', {
@@ -170,7 +174,7 @@ async function addTransaction(
       isTaxClaimable,
       note,
     ]);
-    const [rows] = await execute('CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?)', [
+    const [rows] = await execute('CALL sp_add_transaction_regular(?, ?, ?, ?, ?, ?, ?, ?)', [
       txnDate,
       accountId,
       categoryId,
@@ -178,6 +182,7 @@ async function addTransaction(
       isTaxClaimable ?? false,
       note,
       isRegular,
+      ownerId,
     ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 
@@ -215,7 +220,8 @@ async function updateTransaction(
   amount,
   isTaxClaimable,
   note = null,
-  isRegular = false
+  isRegular = false,
+  ownerId
 ) {
   try {
     console.log('🔍 DEBUG: updateTransaction called with:', {
@@ -239,7 +245,7 @@ async function updateTransaction(
       isTaxClaimable,
       note,
     ]);
-    const [rows] = await execute('CALL sp_update_transaction_regular(?, ?, ?, ?, ?, ?, ?, ?)', [
+    const [rows] = await execute('CALL sp_update_transaction_regular(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       id,
       txnDate,
       accountId,
@@ -248,6 +254,8 @@ async function updateTransaction(
       isTaxClaimable ?? false,
       note,
       isRegular,
+      ownerId ?? null,
+      ownerId !== undefined,
     ]);
     console.log('✅ DEBUG: Stored procedure returned:', rows);
 

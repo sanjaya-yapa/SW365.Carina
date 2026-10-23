@@ -348,12 +348,15 @@ BEGIN
 		t.amount,
 		t.is_tax_claimable,
 		t.is_regular,
+		t.owner_id,
+		o.full_name AS owner_full_name,
 		t.note,
 		t.created_at,
 		t.updated_at
 	FROM transactions t
 	INNER JOIN accounts a ON a.account_id = t.account_id
 	INNER JOIN categories c ON c.category_id = t.category_id
+	LEFT JOIN transaction_owners o ON o.owner_id = t.owner_id
 	WHERE YEAR(t.txn_date) = p_budget_year
 		AND MONTH(t.txn_date) = p_budget_month
 		AND (p_account_id IS NULL OR p_account_id = 0 OR t.account_id = p_account_id)
@@ -588,7 +591,8 @@ CREATE PROCEDURE sp_add_transaction_regular(
 	IN p_amount DECIMAL(12, 2),
 	IN p_is_tax_claimable BOOLEAN,
 	IN p_note VARCHAR(255),
-    IN p_is_regular BOOLEAN
+    IN p_is_regular BOOLEAN,
+    IN p_owner_id BIGINT UNSIGNED
 )
 BEGIN
 	IF p_txn_date IS NULL THEN
@@ -633,8 +637,14 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only expense transactions can be regular';
     END IF;
 
-	INSERT INTO transactions (txn_date, account_id, category_id, amount, is_tax_claimable, note, is_regular)
-	VALUES (p_txn_date, p_account_id, p_category_id, p_amount, COALESCE(p_is_tax_claimable, FALSE), p_note, COALESCE(p_is_regular, FALSE));
+    IF p_owner_id IS NOT NULL AND NOT EXISTS (
+        SELECT 1 FROM transaction_owners WHERE owner_id = p_owner_id
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Transaction owner not found';
+    END IF;
+
+	INSERT INTO transactions (txn_date, account_id, category_id, amount, is_tax_claimable, note, is_regular, owner_id)
+	VALUES (p_txn_date, p_account_id, p_category_id, p_amount, COALESCE(p_is_tax_claimable, FALSE), p_note, COALESCE(p_is_regular, FALSE), p_owner_id);
 
 	SELECT LAST_INSERT_ID() AS transactionId;
 END $$
@@ -647,7 +657,9 @@ CREATE PROCEDURE sp_update_transaction_regular(
 	IN p_amount DECIMAL(12, 2),
 	IN p_is_tax_claimable BOOLEAN,
 	IN p_note VARCHAR(255),
-    IN p_is_regular BOOLEAN
+    IN p_is_regular BOOLEAN,
+    IN p_owner_id BIGINT UNSIGNED,
+    IN p_set_owner BOOLEAN
 )
 BEGIN
 	IF p_transaction_id IS NULL OR p_transaction_id = 0 THEN
@@ -700,6 +712,12 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Only expense transactions can be regular';
     END IF;
 
+    IF p_set_owner AND p_owner_id IS NOT NULL AND NOT EXISTS (
+        SELECT 1 FROM transaction_owners WHERE owner_id = p_owner_id
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Transaction owner not found';
+    END IF;
+
 	UPDATE transactions
 	SET
 		txn_date = p_txn_date,
@@ -708,6 +726,7 @@ BEGIN
 		amount = p_amount,
 		is_tax_claimable = COALESCE(p_is_tax_claimable, FALSE),
 		is_regular = COALESCE(p_is_regular, FALSE),
+		owner_id = IF(p_set_owner, p_owner_id, owner_id),
 		note = p_note
 	WHERE transaction_id = p_transaction_id;
 

@@ -5,11 +5,13 @@ const {
   validatePositiveIntParam,
   validatePositiveIntRange,
   validateOptionalBoolean,
+  validateOptionalOwnerId,
 } = require('../middleware/validate-request');
 
 const router = express.Router();
 
 const completeImportValidators = [
+  validateOptionalOwnerId,
   validatePositiveIntRange('accountId', 1, Number.MAX_SAFE_INTEGER),
   validatePositiveIntRange('categoryId', 1, Number.MAX_SAFE_INTEGER),
   validateOptionalBoolean('isRegular', { defaultValue: false }),

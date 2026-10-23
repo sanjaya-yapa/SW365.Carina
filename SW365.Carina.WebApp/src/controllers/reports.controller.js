@@ -89,12 +89,28 @@ async function getMonthlyExpenses(req, res) {
 }
 
 module.exports = {
+  getOwnerExpenses,
   getMonthlyAnalysis,
   getMonthlyExpenses,
   getMonthSummary,
   getMonthCategoryVariance,
   getAnnualExpenseTrend,
 };
+
+async function getOwnerExpenses(req, res) {
+  try {
+    const result = await reportsService.getOwnerExpenses(
+      Number(req.query.year),
+      Number(req.query.month),
+      req.query.isRegular === undefined ? null : req.query.isRegular === 'true'
+    );
+    return sendSuccess(res, result, 'Owner expense report retrieved successfully', 200);
+  } catch (err) {
+    console.error('Owner expense report failed:', err);
+    const mapped = mapServiceError(err);
+    return sendError(res, mapped.message, null, mapped.statusCode);
+  }
+}
 
 async function getMonthlyAnalysis(req, res) {
   try {

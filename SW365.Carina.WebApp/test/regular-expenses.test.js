@@ -44,8 +44,8 @@ test('create and edit pass Yes/No to persistence; missing defaults to No; invali
           call.sql,
           method === 'POST' ? /sp_add_transaction_regular/ : /sp_update_transaction_regular/
         );
-        assert.equal(call.params.at(-1), value ?? false);
-        assert.equal(call.params.length, method === 'POST' ? 7 : 8);
+        assert.equal(call.params[method === 'POST' ? 6 : 7], value ?? false);
+        assert.equal(call.params.length, method === 'POST' ? 8 : 10);
       }
     }
     for (const value of ['Yes', 'false', 1, null]) {
@@ -106,7 +106,7 @@ test('bank expense import passes the regular flag within its transaction', async
   });
   await imports.completeImport(1, 1, 2, false, true);
   assert.match(calls[0].sql, /sp_add_transaction_regular/);
-  assert.equal(calls[0].params.at(-1), true);
+  assert.equal(calls[0].params[6], true);
   assert.equal(committed, true);
   assert.equal(released, true);
 });

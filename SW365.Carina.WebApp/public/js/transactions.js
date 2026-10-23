@@ -9,6 +9,7 @@ const BANK_IMPORTS_API_BASE = '/api/bank-imports';
 
 let activeAccounts = [];
 let activeCategories = [];
+let transactionOwners = [];
 let loadedTransactions = [];
 let pendingImports = [];
 let selectedTransactionIds = new Set();
@@ -25,6 +26,7 @@ function getImportDraft(importId) {
     importDrafts.set(id, {
       accountId: '',
       categoryId: '',
+      ownerId: '',
       isTaxClaimable: false,
       isRegular: false,
       dirty: false,
@@ -326,13 +328,18 @@ function updateTaxClaimableState() {
 }
 
 async function loadLookups() {
-  [activeAccounts, activeCategories] = await Promise.all([
+  [activeAccounts, activeCategories, transactionOwners] = await Promise.all([
     fetchJson(`${ACCOUNTS_API_BASE}?status=active`),
     fetchJson(`${CATEGORIES_API_BASE}?status=active`),
+    fetchJson('/api/transaction-owners'),
   ]);
 
   populateAccountOptions();
   populateCategoryOptions();
+  const ownerSelect = document.getElementById('ownerId');
+  ownerSelect.replaceChildren();
+  appendOption(ownerSelect, '', 'Unassigned');
+  transactionOwners.forEach((owner) => appendOption(ownerSelect, owner.owner_id, owner.full_name));
   transactionLookupsReady = true;
 }
 
@@ -484,6 +491,8 @@ function createTransactionRow(transaction) {
 
   const noteCell = document.createElement('td');
   noteCell.textContent = transaction.note || '';
+  const ownerCell = document.createElement('td');
+  ownerCell.textContent = transaction.owner_full_name || 'Unassigned';
 
   const actionsCell = document.createElement('td');
   const editButton = document.createElement('a');
@@ -502,6 +511,7 @@ function createTransactionRow(transaction) {
     regularCell,
     amountCell,
     noteCell,
+    ownerCell,
     actionsCell
   );
   return row;
@@ -718,6 +728,10 @@ function createPendingImportRow(importRow) {
     ['true', 'Yes'],
   ]);
   regularCell.firstChild.disabled = completingImports || !isExpense;
+  const ownerCell = selectCellFor('ownerId', 'Owner', [
+    ['', 'Unassigned'],
+    ...transactionOwners.map((owner) => [owner.owner_id, owner.full_name]),
+  ]);
 
   const actionsCell = document.createElement('td');
   const completeButton = document.createElement('button');
@@ -750,6 +764,7 @@ function createPendingImportRow(importRow) {
     categoryCell,
     taxCell,
     regularCell,
+    ownerCell,
     actionsCell
   );
   return row;
@@ -785,6 +800,7 @@ async function completePendingImports(ids) {
           body: JSON.stringify({
             accountId: Number(draft.accountId),
             categoryId: Number(draft.categoryId),
+            ownerId: draft.ownerId ? Number(draft.ownerId) : null,
             isTaxClaimable: isExpense && draft.isTaxClaimable,
             isRegular: isExpense && draft.isRegular,
           }),
@@ -1020,6 +1036,9 @@ async function handleTransactionSubmit(event) {
     txnDate: document.getElementById('txnDate').value,
     accountId: Number(document.getElementById('accountId').value),
     categoryId: Number(document.getElementById('categoryId').value),
+    ownerId: document.getElementById('ownerId').value
+      ? Number(document.getElementById('ownerId').value)
+      : null,
     amount: Number(document.getElementById('amount').value),
     isTaxClaimable: document.getElementById('isTaxClaimable').checked,
     isRegular: document.getElementById('isRegular').value === 'true',

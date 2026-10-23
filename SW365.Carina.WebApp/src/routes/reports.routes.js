@@ -27,6 +27,12 @@ router.get(
 );
 
 router.get(
+  '/owner-expenses',
+  validateRequest([...monthlyReportValidators, validateRegularFilter]),
+  reportsController.getOwnerExpenses
+);
+
+router.get(
   '/monthly-expenses',
   validateRequest([...monthlyReportValidators, validateRegularFilter]),
   reportsController.getMonthlyExpenses

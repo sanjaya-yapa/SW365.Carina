@@ -139,28 +139,39 @@ function fromCents(cents) {
 }
 
 async function getMonthlyExpenses(year, month, isRegular = null) {
+  return getGroupedMonthlyExpenses(year, month, isRegular, false);
+}
+
+async function getOwnerExpenses(year, month, isRegular = null) {
+  return getGroupedMonthlyExpenses(year, month, isRegular, true);
+}
+
+async function getGroupedMonthlyExpenses(year, month, isRegular, byOwner) {
   const start = `${year}-${String(month).padStart(2, '0')}-01`;
   const end =
     month === 12 ? `${year + 1}-01-01` : `${year}-${String(month + 1).padStart(2, '0')}-01`;
   const [rows] = await getExecute()(
     `SELECT t.transaction_id, t.txn_date, t.note, t.amount, t.is_regular,
             c.category_id, c.category_name, a.account_name
+            ${byOwner ? ', t.owner_id, o.full_name AS owner_full_name' : ''}
        FROM transactions t
        INNER JOIN categories c ON c.category_id = t.category_id
        INNER JOIN accounts a ON a.account_id = t.account_id
+       ${byOwner ? 'LEFT JOIN transaction_owners o ON o.owner_id = t.owner_id' : ''}
       WHERE c.category_type = 'EXPENSE' AND t.txn_date >= ? AND t.txn_date < ?
       ${isRegular === null ? '' : 'AND t.is_regular = ?'}
-      ORDER BY c.category_name, c.category_id, t.txn_date, t.transaction_id`,
+      ORDER BY ${byOwner ? 'o.full_name, t.owner_id' : 'c.category_name, c.category_id'}, t.txn_date, t.transaction_id`,
     isRegular === null ? [start, end] : [start, end, isRegular]
   );
   const groups = new Map();
   let grandTotal = 0n;
   for (const row of rows) {
-    const key = String(row.category_id);
+    const key = String(byOwner ? row.owner_id : row.category_id);
     if (!groups.has(key)) {
       groups.set(key, {
-        category_id: row.category_id,
-        category_name: row.category_name,
+        ...(byOwner
+          ? { owner_id: row.owner_id, owner_name: row.owner_full_name || 'Unassigned' }
+          : { category_id: row.category_id, category_name: row.category_name }),
         expenses: [],
         cents: 0n,
       });
@@ -172,6 +183,7 @@ async function getMonthlyExpenses(year, month, isRegular = null) {
       date: row.txn_date,
       description: row.note || `Expense #${row.transaction_id}`,
       account_name: row.account_name,
+      ...(byOwner ? { category_name: row.category_name } : {}),
       is_regular: Number(row.is_regular) === 1,
       amount: fromCents(cents),
     });
@@ -181,7 +193,7 @@ async function getMonthlyExpenses(year, month, isRegular = null) {
   return {
     year,
     month,
-    categories: Array.from(groups.values(), ({ cents, ...group }) => ({
+    [byOwner ? 'owners' : 'categories']: Array.from(groups.values(), ({ cents, ...group }) => ({
       ...group,
       total: fromCents(cents),
     })),
@@ -190,6 +202,7 @@ async function getMonthlyExpenses(year, month, isRegular = null) {
 }
 
 module.exports = {
+  getOwnerExpenses,
   getMonthlyAnalysis,
   getMonthlyExpenses,
   getMonthSummary,
