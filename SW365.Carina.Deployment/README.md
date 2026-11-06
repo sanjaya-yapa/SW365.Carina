@@ -335,6 +335,7 @@ Start it again when needed:
 
 ```powershell
 az vm start --resource-group "rg-carina-personal" --name "vm-carina-personal"
+
 ```
 
 ## Security Notes

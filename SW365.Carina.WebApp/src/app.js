@@ -12,6 +12,16 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.get('/vendor/chart.umd.js', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'node_modules', 'chart.js', 'dist', 'chart.umd.js'));
 });
+app.get('/vendor/bootstrap.bundle.min.js', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.bundle.min.js')
+  );
+});
+app.get('/vendor/bootstrap.min.css', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css')
+  );
+});
 
 app.get('/health', (req, res) => {
   return sendSuccess(res, null, 'API is running', 200);

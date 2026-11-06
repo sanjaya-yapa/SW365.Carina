@@ -2,6 +2,102 @@ body {
   background-color: #f8f9fa;
 }
 
+.app-shell {
+  --app-sidebar-width: 15rem;
+}
+
+.app-brand {
+  color: #fff;
+  font-size: 1.1rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-brand:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.app-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.app-sidebar {
+  --bs-offcanvas-width: min(19rem, 90vw);
+}
+
+.app-sidebar .offcanvas-header {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid #495057;
+}
+
+.app-sidebar .offcanvas-body {
+  display: block;
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.app-sidebar .nav-link {
+  color: #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+}
+
+.app-sidebar .nav-link:hover {
+  color: #fff;
+  background-color: #343a40;
+}
+
+.app-sidebar .nav-link.active {
+  color: #fff;
+  background-color: #0d6efd;
+}
+
+.app-sidebar a:focus-visible,
+.app-mobile-header a:focus-visible,
+.app-mobile-header button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.app-skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1100;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  background: #212529;
+  transform: translateY(-200%);
+}
+
+.app-skip-link:focus {
+  transform: none;
+}
+
+@media (min-width: 992px) {
+  .app-shell {
+    padding-left: var(--app-sidebar-width);
+  }
+
+  .app-sidebar.offcanvas-lg {
+    position: fixed;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    width: var(--app-sidebar-width);
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
 .payment-calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(130px, 1fr));

@@ -31,9 +31,28 @@ npm run dev
 
 - `http://localhost:3000`
 
+## Navigation
+
+All pages share a left sidebar with Home, Dashboard, Accounts, Categories, Owners,
+Budgets, Transactions, Payments and Reports. The current section is highlighted,
+including its add/edit and report detail pages. Existing URLs are unchanged.
+Below 992px, use **Menu** to open the left navigation drawer; close it with its close
+button, Escape or the backdrop. Keyboard users can skip directly to main content.
+
+The shared menu is defined in `public/js/navigation.js`, loaded synchronously before
+page-specific scripts. Each page supplies `appNavigation` and a focusable `mainContent`
+landmark. Add future pages to the appropriate menu entry's parent-page mapping.
+Bootstrap CSS and the bundle are served from the installed package at `/vendor/`
+so the drawer does not require a third-party CDN to operate.
+
+Deploy the updated application with the existing application-update workflow; include
+the HTML, shared CSS/JavaScript and `src/app.js`, and install the locked dependencies
+as usual. No database migration or environment change is required.
+Run navigation regressions with `node --test test/navigation.test.js`.
+
 ## Transaction owners
 
-Open **Transactions → Owners** (or **Manage owners** beside the owner selector) to
+Open **Owners** in the sidebar (or **Manage owners** beside the owner selector) to
 create and edit owners. First and last names are required; full name is generated
 automatically. Email address and phone number are optional. Owners are independent
 of accounts and login users, and one owner can have multiple transactions.
