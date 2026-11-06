@@ -61,6 +61,8 @@ async function loadExpenseReport(event) {
   const [year, month] = document.getElementById('reportMonth').value.split('-');
   const regular = document.getElementById('reportRegular').value;
   const regularQuery = regular === '' ? '' : `&isRegular=${regular}`;
+  const account = byOwner ? document.getElementById('reportAccount').value : '';
+  const accountQuery = account ? `&accountId=${encodeURIComponent(account)}` : '';
   const status = document.getElementById('reportStatus');
   const button = document.getElementById('generateReport');
   document.getElementById('expenseReport').hidden = true;
@@ -70,7 +72,7 @@ async function loadExpenseReport(event) {
   button.disabled = true;
   try {
     const response = await fetch(
-      `/api/reports/${byOwner ? 'owner-expenses' : 'monthly-expenses'}?year=${year}&month=${Number(month)}${regularQuery}`
+      `/api/reports/${byOwner ? 'owner-expenses' : 'monthly-expenses'}?year=${year}&month=${Number(month)}${regularQuery}${accountQuery}`
     );
     const payload = await response.json();
     if (!response.ok || !payload.success)

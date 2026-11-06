@@ -1,5 +1,34 @@
 let ownerChart = null;
 
+async function loadOwnerReportAccounts() {
+  const select = document.getElementById('reportAccount');
+  const status = document.getElementById('accountFilterStatus');
+  try {
+    const response = await fetch('/api/accounts?status=all');
+    const payload = await response.json();
+    if (!response.ok || !payload.success || !Array.isArray(payload.data)) {
+      throw new Error('Unable to load accounts');
+    }
+    for (const account of payload.data) {
+      const option = document.createElement('option');
+      option.value = String(account.account_id);
+      option.textContent =
+        account.account_name + (Number(account.is_active) === 0 ? ' (Inactive)' : '');
+      select.appendChild(option);
+    }
+    select.disabled = false;
+    status.textContent = '';
+  } catch (error) {
+    status.className = 'text-danger';
+    status.textContent = 'Unable to load the account filter. Reload the page to try again.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('reportAccount').addEventListener('change', loadExpenseReport);
+  loadOwnerReportAccounts();
+});
+
 function ownerColour(id) {
   let hash = 0;
   for (const char of String(id)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;

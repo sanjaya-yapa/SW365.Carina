@@ -65,8 +65,10 @@ user needs permission to create and drop test databases; existing databases are 
 
 Open **Reports → Spending by Owner & Expense Details** for a pie chart of each owner's
 spending, followed by expense details grouped by owner, owner subtotals, and a grand total.
-The current month loads automatically. Month and **Is Regular** filters apply to both
-the chart and details. Hover over a slice for the amount and percentage.
+The current month loads automatically. Month, **Is Regular**, and **Account** filters apply
+to both the chart and details, including owner subtotals and the grand total. Account defaults
+to **All accounts** and includes inactive accounts for historical spending. Changing a filter
+refreshes the report. Hover over a slice for the amount and percentage.
 
 Unassigned transactions form an **Unassigned** group. Owners with the same name remain
 separate groups by ID. Only recorded expense transactions are included, using the same
@@ -74,7 +76,8 @@ rules as the daily expense report. Zero-value expenses remain in the table but d
 produce pie slices. Exact totals are available in the table even if the chart cannot load.
 
 API: `GET /api/reports/owner-expenses?year=2026&month=10`, optionally with
-`isRegular=true` or `isRegular=false`. The response contains `owners` (each with `owner_id`,
+`isRegular=true` or `isRegular=false` and/or `accountId` (a positive integer). Omit
+`accountId` for all accounts. The response contains `owners` (each with `owner_id`,
 `owner_name`, `expenses`, and `total`) and `grand_total`.
 No additional migration is needed after the transaction-owner migration.
 Deploy the updated application with the existing application-update script.

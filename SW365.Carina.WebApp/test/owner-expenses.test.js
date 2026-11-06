@@ -17,17 +17,39 @@ const expense = {
   is_regular: 0,
 };
 const rows = [
-  { ...expense, transaction_id: 1, owner_id: null, owner_full_name: null, amount: '4.00' },
-  { ...expense, transaction_id: 2, owner_id: 1, owner_full_name: '<Alex Smith>', amount: '0.10' },
   {
     ...expense,
+    account_id: 1,
+    transaction_id: 1,
+    owner_id: null,
+    owner_full_name: null,
+    amount: '4.00',
+  },
+  {
+    ...expense,
+    account_id: 2,
+    transaction_id: 2,
+    owner_id: 1,
+    owner_full_name: '<Alex Smith>',
+    amount: '0.10',
+  },
+  {
+    ...expense,
+    account_id: 2,
     transaction_id: 3,
     owner_id: 1,
     owner_full_name: '<Alex Smith>',
     amount: '0.20',
     is_regular: 1,
   },
-  { ...expense, transaction_id: 4, owner_id: 2, owner_full_name: '<Alex Smith>', amount: '10.00' },
+  {
+    ...expense,
+    account_id: 1,
+    transaction_id: 4,
+    owner_id: 2,
+    owner_full_name: '<Alex Smith>',
+    amount: '10.00',
+  },
 ];
 
 test('owner grouping preserves unassigned and same-name owners with exact totals', async () => {
@@ -38,6 +60,7 @@ test('owner grouping preserves unassigned and same-name owners with exact totals
     assert.match(sql, /t.txn_date >= \? AND t.txn_date < \?/);
     assert.match(sql, /ORDER BY o.full_name, t.owner_id, t.txn_date, t.transaction_id/);
     assert.doesNotMatch(sql, /is_active|bank_imports/);
+    assert.doesNotMatch(sql, /AND t.account_id = \?/);
     return [rows];
   };
   const report = await reports.getOwnerExpenses(2026, 10);
@@ -73,6 +96,9 @@ test('owner endpoint validates filters, passes regular flags, and handles empty 
       '?year=2026&month=1.5',
       '?year=2026&month=10&isRegular=yes',
       '?year=2026&month=10&isRegular=true&isRegular=false',
+      ...['', '0', '-1', '1.5', 'abc', '9007199254740992', '1&accountId=2', '1e2'].map(
+        (id) => `?year=2026&month=10&accountId=${id}`
+      ),
     ]) {
       assert.equal((await fetch(endpoint + query)).status, 400);
     }
@@ -95,6 +121,38 @@ test('owner endpoint validates filters, passes regular flags, and handles empty 
       assert.equal(payload.success, true);
       assert.equal(payload.data.grand_total, total);
     }
+    for (const [regular, flag, total] of [
+      ['', null, '0.30'],
+      ['&isRegular=true', true, '0.20'],
+      ['&isRegular=false', false, '0.10'],
+    ]) {
+      db.execute = async (sql, params) => {
+        assert.match(sql, /AND t.account_id = \?/);
+        assert.doesNotMatch(sql, /is_active/);
+        assert.deepEqual(
+          params,
+          flag === null ? ['2026-10-01', '2026-11-01', 2] : ['2026-10-01', '2026-11-01', flag, 2]
+        );
+        return [
+          rows.filter(
+            (row) => row.account_id === 2 && (flag === null || Boolean(row.is_regular) === flag)
+          ),
+        ];
+      };
+      const response = await fetch(`${endpoint}?year=2026&month=10&accountId=2${regular}`);
+      assert.equal(response.status, 200);
+      const { data } = await response.json();
+      assert.equal(data.grand_total, total);
+      assert.equal(data.owners.length, 1);
+      assert.equal(data.owners[0].total, total);
+    }
+    db.execute = async (sql, params) => {
+      assert.equal(params[2], 999);
+      return [[]];
+    };
+    const noMatches = await (await fetch(`${endpoint}?year=2026&month=10&accountId=999`)).json();
+    assert.deepEqual(noMatches.data.owners, []);
+    assert.equal(noMatches.data.grand_total, '0.00');
     db.execute = async (sql, params) => {
       assert.deepEqual(params, ['2100-12-01', '2101-01-01']);
       return [[]];

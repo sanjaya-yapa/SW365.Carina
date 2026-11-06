@@ -20,6 +20,19 @@ function validateRegularFilter(req) {
   return null;
 }
 
+function validateAccountFilter(req) {
+  const value = req.query.accountId;
+  if (value === undefined) return null;
+  if (
+    typeof value !== 'string' ||
+    !/^[1-9]\d*$/.test(value) ||
+    !Number.isSafeInteger(Number(value))
+  ) {
+    return { field: 'accountId', message: 'accountId must be a positive integer' };
+  }
+  return null;
+}
+
 router.get(
   '/monthly-analysis',
   validateRequest([...annualTrendValidators, validateRegularFilter]),
@@ -28,7 +41,7 @@ router.get(
 
 router.get(
   '/owner-expenses',
-  validateRequest([...monthlyReportValidators, validateRegularFilter]),
+  validateRequest([...monthlyReportValidators, validateRegularFilter, validateAccountFilter]),
   reportsController.getOwnerExpenses
 );
 

@@ -6,9 +6,15 @@ const vm = require('node:vm');
 
 function setup() {
   const elements = new Map();
+  const ready = [];
   function element() {
     return {
       children: [],
+      value: '',
+      listeners: {},
+      addEventListener(name, listener) {
+        this.listeners[name] = listener;
+      },
       hidden: false,
       className: '',
       appendChild(child) {
@@ -37,7 +43,9 @@ function setup() {
     document: {
       createElement: element,
       getElementById: get,
-      addEventListener() {},
+      addEventListener(name, listener) {
+        if (name === 'DOMContentLoaded') ready.push(listener);
+      },
       body: { dataset: { reportGroup: 'owner' } },
     },
     window: { Chart },
@@ -68,7 +76,7 @@ function setup() {
       },
     ],
   };
-  return { context, get, charts, run: (code) => vm.runInContext(code, context) };
+  return { context, get, charts, ready, run: (code) => vm.runInContext(code, context) };
 }
 
 test('pie slices and tooltip agree with owner details and grand total', () => {
@@ -137,4 +145,74 @@ test('owner loader uses the selected filters, renders results and reports HTTP f
   assert.equal(get('expenseReport').hidden, true);
   assert.equal(get('ownerReport').hidden, true);
   assert.equal(get('generateReport').disabled, false);
+});
+
+test('account filter loads active and inactive accounts as safe text and wires changes', async () => {
+  const { context, get, ready, run } = setup();
+  context.fetch = async (url) => {
+    assert.equal(url, '/api/accounts?status=all');
+    return {
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: [
+          { account_id: 1, account_name: '<Cash>', is_active: 1 },
+          { account_id: 2, account_name: 'Old bank', is_active: 0 },
+        ],
+      }),
+    };
+  };
+  get('reportAccount').disabled = true;
+  await run('loadOwnerReportAccounts()');
+  assert.equal(get('reportAccount').disabled, false);
+  assert.equal(get('reportAccount').children[0].value, '1');
+  assert.equal(get('reportAccount').children[0].textContent, '<Cash>');
+  assert.equal(get('reportAccount').children[1].textContent, 'Old bank (Inactive)');
+  assert.equal(get('accountFilterStatus').textContent, '');
+  ready[1]();
+  assert.equal(get('reportAccount').listeners.change, context.loadExpenseReport);
+});
+
+test('account loading failures are explicit and leave the filter disabled', async () => {
+  for (const response of [
+    { ok: false, json: async () => ({ success: false }) },
+    { ok: true, json: async () => ({ success: true, data: null }) },
+  ]) {
+    const { context, get, run } = setup();
+    get('reportAccount').disabled = true;
+    context.fetch = async () => response;
+    await run('loadOwnerReportAccounts()');
+    assert.equal(get('reportAccount').disabled, true);
+    assert.match(get('accountFilterStatus').textContent, /Unable to load the account filter/);
+  }
+});
+
+test('selected account refreshes chart and details with combined filters and can be cleared', async () => {
+  const { context, get, charts, run } = setup();
+  get('reportFilters').reportValidity = () => true;
+  get('reportMonth').value = '2026-10';
+  get('reportRegular').value = 'false';
+  get('reportAccount').value = '2';
+  context.fetch = async (url) => {
+    assert.equal(url, '/api/reports/owner-expenses?year=2026&month=10&isRegular=false&accountId=2');
+    return {
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: { ...context.report, owners: [context.report.owners[1]], grand_total: '7.50' },
+      }),
+    };
+  };
+  await run('loadExpenseReport()');
+  assert.deepEqual(Array.from(charts[0].config.data.datasets[0].data), [7.5]);
+  assert.equal(get('grandTotal').textContent, '$7.50');
+  assert.equal(get('reportRows').children.length, 3);
+  get('reportAccount').value = '';
+  context.fetch = async (url) => {
+    assert.equal(url, '/api/reports/owner-expenses?year=2026&month=10&isRegular=false');
+    return { ok: true, json: async () => ({ success: true, data: context.report }) };
+  };
+  await run('loadExpenseReport()');
+  assert.equal(charts[0].destroyed, true);
+  assert.equal(get('grandTotal').textContent, '$10.00');
 });

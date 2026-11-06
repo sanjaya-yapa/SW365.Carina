@@ -102,7 +102,8 @@ async function getOwnerExpenses(req, res) {
     const result = await reportsService.getOwnerExpenses(
       Number(req.query.year),
       Number(req.query.month),
-      req.query.isRegular === undefined ? null : req.query.isRegular === 'true'
+      req.query.isRegular === undefined ? null : req.query.isRegular === 'true',
+      req.query.accountId === undefined ? null : Number(req.query.accountId)
     );
     return sendSuccess(res, result, 'Owner expense report retrieved successfully', 200);
   } catch (err) {

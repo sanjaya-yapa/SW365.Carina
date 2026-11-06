@@ -100,6 +100,20 @@
             <option value="false">No</option>
           </select>
         </div>
+        <div class="col-sm-5 col-md-3">
+          <label for="reportAccount" class="form-label">Account</label>
+          <select
+            id="reportAccount"
+            class="form-select"
+            aria-describedby="accountFilterStatus"
+            disabled
+          >
+            <option value="" selected>All accounts</option>
+          </select>
+          <small id="accountFilterStatus" role="status" class="text-muted"
+            >Loading accounts...</small
+          >
+        </div>
         <div class="col-auto">
           <button id="generateReport" class="btn btn-primary" type="submit">Generate report</button>
         </div>

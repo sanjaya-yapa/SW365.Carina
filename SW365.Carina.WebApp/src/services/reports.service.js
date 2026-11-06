@@ -142,14 +142,17 @@ async function getMonthlyExpenses(year, month, isRegular = null) {
   return getGroupedMonthlyExpenses(year, month, isRegular, false);
 }
 
-async function getOwnerExpenses(year, month, isRegular = null) {
-  return getGroupedMonthlyExpenses(year, month, isRegular, true);
+async function getOwnerExpenses(year, month, isRegular = null, accountId = null) {
+  return getGroupedMonthlyExpenses(year, month, isRegular, true, accountId);
 }
 
-async function getGroupedMonthlyExpenses(year, month, isRegular, byOwner) {
+async function getGroupedMonthlyExpenses(year, month, isRegular, byOwner, accountId = null) {
   const start = `${year}-${String(month).padStart(2, '0')}-01`;
   const end =
     month === 12 ? `${year + 1}-01-01` : `${year}-${String(month + 1).padStart(2, '0')}-01`;
+  const params = [start, end];
+  if (isRegular !== null) params.push(isRegular);
+  if (accountId !== null) params.push(accountId);
   const [rows] = await getExecute()(
     `SELECT t.transaction_id, t.txn_date, t.note, t.amount, t.is_regular,
             c.category_id, c.category_name, a.account_name
@@ -160,8 +163,9 @@ async function getGroupedMonthlyExpenses(year, month, isRegular, byOwner) {
        ${byOwner ? 'LEFT JOIN transaction_owners o ON o.owner_id = t.owner_id' : ''}
       WHERE c.category_type = 'EXPENSE' AND t.txn_date >= ? AND t.txn_date < ?
       ${isRegular === null ? '' : 'AND t.is_regular = ?'}
+      ${accountId === null ? '' : 'AND t.account_id = ?'}
       ORDER BY ${byOwner ? 'o.full_name, t.owner_id' : 'c.category_name, c.category_id'}, t.txn_date, t.transaction_id`,
-    isRegular === null ? [start, end] : [start, end, isRegular]
+    params
   );
   const groups = new Map();
   let grandTotal = 0n;
